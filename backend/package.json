@@ -1,0 +1,33 @@
+{
+  "name": "chat-app-backend",
+  "version": "1.0.0",
+  "description": "The Backend of Chat App",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx --watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc"
+  },
+  "author": "Badraan",
+  "license": "ISC",
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@tsconfig/node22": "^22.0.2",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.0",
+    "eslint": "^9.28.0",
+    "eslint-plugin-perfectionist": "^4.14.0",
+    "prettier": "^3.5.3",
+    "tsx": "^4.20.1",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.34.0"
+  }
+}

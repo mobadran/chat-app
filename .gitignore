@@ -1,0 +1,55 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/ # pnpm store directory
+
+# TypeScript compilation output for backend
+backend/dist/
+build/
+*.js.map # Source maps
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Vite / Frontend build output
+# Vite usually outputs to 'dist' but good to be explicit
+# if your Vite project is within a subdirectory like 'frontend/'
+# you might need to adjust this, e.g., 'frontend/dist/'
+frontend/dist/
+
+# Editor/IDE specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Test results
+coverage/
+.nyc_output/
+
+# Dependency Injection containers or temporary files
+# e.g., if using tsyringe or similar
+tmp/
+
+# If you are using pm2 or similar process managers
+pm2-logs/
+ecosystem.config.js # or .json if you don't want to commit it
+
+# Sentry or other error reporting artifacts
+.sentryclirc
+
+# Any generated documentation
+docs/
