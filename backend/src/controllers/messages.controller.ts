@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import ConversationMember from '#models/conversationMember.model.js';
 import Message from '#models/message.model.js';
-import { CREATED, FORBIDDEN } from '#constants/http-status-codes.js';
+import { CREATED, FORBIDDEN, OK } from '#constants/http-status-codes.js';
 import { Document } from 'mongoose';
 import { IUser } from '#models/user.model.js';
 
@@ -30,6 +30,24 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
     });
 
     res.status(CREATED).json({ message: 'Message sent successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMessages = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { conversationId } = req.params;
+    const userId = req.user!.id;
+
+    const memberRecord = await ConversationMember.findOne({ conversationId, userId }).populate('userId', 'username displayName');
+    if (!memberRecord) {
+      res.status(FORBIDDEN).json({ message: 'You are not authorized to view messages for this conversation, or the conversation/user does not exist.' });
+      return;
+    }
+
+    const messages = await Message.find({ conversationId }).populate('senderId', 'username displayName');
+    res.status(OK).json(messages);
   } catch (error) {
     next(error);
   }
