@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import User, { IUser } from '#models/user.model.js';
 import { generateAccessToken } from '#utils/jwt.utils.js';
-import validator from '#vaildators/auth.validator.js';
+import validator from '#validators/auth.validator.js';
 import { ZodError } from 'zod/v4';
 import RefreshToken from '#models/refreshToken.model.js';
 import { v4 as uuidv4 } from 'uuid';

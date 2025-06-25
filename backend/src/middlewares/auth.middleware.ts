@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '#utils/jwt.utils.js';
-import validator from '#vaildators/auth.validator.js';
+import validator from '#validators/auth.validator.js';
 import { ZodError } from 'zod';
 
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
