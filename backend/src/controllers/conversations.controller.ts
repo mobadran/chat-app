@@ -1,8 +1,9 @@
-import Conversation from '#models/conversation.model.js';
+import Conversation, { IConversation } from '#models/conversation.model.js';
 import ConversationMember from '#models/conversationMember.model.js';
 import User from '#models/user.model.js';
 import { NextFunction, Request, Response } from 'express';
-import { BAD_REQUEST, CREATED } from '#constants/http-status-codes.js';
+import { BAD_REQUEST, CREATED, OK } from '#constants/http-status-codes.js';
+import { Document } from 'mongoose';
 
 export const createConversation = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -44,6 +45,27 @@ export const createConversation = async (req: Request, res: Response, next: Next
     await ConversationMember.insertMany(conversationMembers);
 
     res.status(CREATED).json({ message: 'Conversation created successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getConversations = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const conversations = await ConversationMember.find({ userId: req.user!.id }).select('conversationId').populate('conversationId');
+    res.status(OK).json(
+      conversations.map((c) => {
+        // Explicitly cast c.conversationId to the expected populated type.
+        // This tells TypeScript, "I know for a fact that after 'populate',
+        // this will be an IConversation & Document."
+        const populatedConversation = c.conversationId as IConversation & Document;
+
+        return {
+          type: populatedConversation.type,
+          name: populatedConversation.name,
+        };
+      }),
+    );
   } catch (error) {
     next(error);
   }
