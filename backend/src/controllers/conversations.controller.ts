@@ -61,6 +61,7 @@ export const getConversations = async (req: Request, res: Response, next: NextFu
         const populatedConversation = c.conversationId as IConversation & Document;
 
         return {
+          _id: populatedConversation._id,
           type: populatedConversation.type,
           name: populatedConversation.name,
         };
