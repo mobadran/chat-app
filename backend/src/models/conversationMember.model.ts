@@ -1,20 +1,12 @@
-// src/models/ConversationMember.ts
-
-// 1. IMPORT PopulatedDoc from 'mongoose'
-// 2. IMPORT the IConversation interface from your Conversation model file
 import mongoose, { Document, Schema, Model, PopulatedDoc } from 'mongoose';
-import { IConversation } from './conversation.model.js'; // Adjust path if necessary
+import { IConversation } from './conversation.model.js';
+import { IUser } from './user.model.js';
 
 export interface IConversationMember extends Document {
-  _id: mongoose.Types.ObjectId; // MongoDB _id type
-  userId: mongoose.Types.ObjectId; // User ObjectId
-  // THIS IS THE LINE YOU NEED TO CHANGE:
-  // It tells TypeScript that 'conversationId' can either be an ObjectId
-  // OR a fully populated IConversation document (including Mongoose Document properties).
-  conversationId: PopulatedDoc<IConversation & Document>; // <--- THIS IS THE SOLUTION
-  joinedAt: Date; // From timestamps
-  createdAt: Date; // Mongoose Document property
-  updatedAt: Date; // Mongoose Document property (if timestamps is enabled for this field)
+  _id: mongoose.Types.ObjectId;
+  userId: PopulatedDoc<IUser & Document>;
+  conversationId: PopulatedDoc<IConversation & Document>;
+  joinedAt: Date;
 }
 
 const ConversationMemberSchema: Schema = new Schema<IConversationMember>(
@@ -31,7 +23,7 @@ const ConversationMemberSchema: Schema = new Schema<IConversationMember>(
     },
   },
   {
-    timestamps: { createdAt: 'joinedAt', updatedAt: false }, // Use 'joinedAt' for creation time, disable 'updatedAt'
+    timestamps: { createdAt: 'joinedAt', updatedAt: false },
   },
 );
 

@@ -55,9 +55,6 @@ export const getConversations = async (req: Request, res: Response, next: NextFu
     const conversations = await ConversationMember.find({ userId: req.user!.id }).select('conversationId').populate('conversationId');
     res.status(OK).json(
       conversations.map((c) => {
-        // Explicitly cast c.conversationId to the expected populated type.
-        // This tells TypeScript, "I know for a fact that after 'populate',
-        // this will be an IConversation & Document."
         const populatedConversation = c.conversationId as IConversation & Document;
 
         return {

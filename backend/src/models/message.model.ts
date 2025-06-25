@@ -8,7 +8,6 @@ export interface IMessage extends Document {
     displayName: string;
   };
   content: string;
-  type: 'text';
 }
 
 const MessageSchema: Schema = new Schema<IMessage>(
@@ -31,12 +30,6 @@ const MessageSchema: Schema = new Schema<IMessage>(
       type: String,
       required: true,
       trim: true,
-    },
-    type: {
-      type: String,
-      required: true,
-      enum: ['text'],
-      default: 'text',
     },
   },
   {
