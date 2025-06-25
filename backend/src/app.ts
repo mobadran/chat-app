@@ -2,9 +2,12 @@ import express, { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import { configDotenv } from 'dotenv';
 import csrf from 'csurf';
-import authRoutes from '#routes/auth.routes.js';
 import errorHandler from '#middlewares/error.middleware.js';
 import { FORBIDDEN } from '#constants/http-status-codes.js';
+import authRoutes from '#routes/auth.routes.js';
+import usersRoutes from '#routes/users.routes.js';
+import conversationsRoutes from '#routes/conversations.routes.js';
+import messagesRoutes from '#routes/messages.routes.js';
 
 configDotenv();
 
@@ -37,7 +40,10 @@ app.get('/api/v1/csrf-token', csrfProtection, (req: Request, res: Response) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
-app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1', authRoutes);
+app.use('/api/v1', usersRoutes);
+app.use('/api/v1', conversationsRoutes);
+app.use('/api/v1', messagesRoutes);
 
 // Error Handling Middlewares
 // CSRF error handler

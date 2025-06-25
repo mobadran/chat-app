@@ -10,8 +10,8 @@ if (!ACCESS_TOKEN_SECRET) {
 }
 const ACCESS_EXPIRES_IN = ACCESS_TOKEN_TTL / 1000;
 
-export const generateAccessToken = (userId: string) => {
-  return jwt.sign({ userId }, ACCESS_TOKEN_SECRET, {
+export const generateAccessToken = (userId: string, username: string) => {
+  return jwt.sign({ userId, username }, ACCESS_TOKEN_SECRET, {
     expiresIn: ACCESS_EXPIRES_IN,
   });
 };
@@ -19,5 +19,6 @@ export const generateAccessToken = (userId: string) => {
 export const verifyAccessToken = (token: string) => {
   return jwt.verify(token, ACCESS_TOKEN_SECRET) as {
     userId: string;
+    username: string;
   };
 };

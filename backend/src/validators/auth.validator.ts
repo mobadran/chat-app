@@ -11,12 +11,21 @@ const Register = z.object({
         /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])(?=^\S+$)./,
         'Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and no spaces.',
       ),
+    username: z
+      .string()
+      .min(3)
+      .max(32)
+      .regex(/^[a-zA-Z0-9_-]+$/),
+    displayName: z.string().min(3).max(32).optional(),
   }),
 });
 
 const Login = z.object({
   body: z.object({
-    email: z.string().email(),
+    email: z
+      .string()
+      .email()
+      .or(z.string().regex(/^[a-zA-Z0-9_-]+$/)),
     password: z.string(),
   }),
 });

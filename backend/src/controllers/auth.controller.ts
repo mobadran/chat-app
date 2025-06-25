@@ -10,7 +10,7 @@ import { AUTH_MESSAGES } from '#constants/messages.js';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, username, displayName } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -19,13 +19,18 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    const user = await User.create({ email, hashedPassword });
+    const user = await User.create({
+      email,
+      hashedPassword,
+      username,
+      displayName: displayName || null,
+    });
 
     const deviceId = uuidv4();
     const refreshToken = uuidv4();
     await RefreshToken.create({ userId: user._id, token: refreshToken, deviceId });
 
-    const accessToken = generateAccessToken(user._id.toString());
+    const accessToken = generateAccessToken(user._id.toString(), user.username);
 
     res.cookie('deviceId', deviceId, COOKIE_OPTIONS);
     res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
@@ -41,9 +46,10 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   try {
     const { email, password } = req.body;
 
-    const user = (await User.findOne({ email })) as IUser;
+    const user = (await User.findOne({ $or: [{ email }, { username: email }] })) as IUser;
     if (!user) {
-      await bcrypt.compare(password, 'dsa120j0jcs091j98123921js9dskj12k3o123213213');
+      // Fake compare to prevent timing attacks
+      await bcrypt.compare(password, '$2b$12$PKkzH3hI7ahICMVp3q/.1uEWpVgvhBSbNjlRVTkD8M0UVVsC6G9Qm');
       res.status(BAD_REQUEST).json({ message: AUTH_MESSAGES.INVALID_CREDENTIALS });
       return;
     }
@@ -54,7 +60,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
 
-    const accessToken = generateAccessToken(user._id.toString());
+    const accessToken = generateAccessToken(user._id.toString(), user.username);
     const refreshToken = uuidv4();
 
     let deviceId = req.cookies.deviceId;
@@ -85,6 +91,12 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
       return;
     }
 
+    const user = await User.findById(existingRefreshToken.userId);
+    if (!user) {
+      res.status(FORBIDDEN).json({ message: AUTH_MESSAGES.INVALID_REFRESH_TOKEN });
+      return;
+    }
+
     if (Date.now() - existingRefreshToken.createdAt.getTime() > REFRESH_TOKEN_TTL) {
       res.status(FORBIDDEN).json({ message: AUTH_MESSAGES.INVALID_REFRESH_TOKEN });
       return;
@@ -97,7 +109,7 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
       return;
     }
 
-    const newAccessToken = generateAccessToken(existingRefreshToken.userId.toString());
+    const newAccessToken = generateAccessToken(existingRefreshToken.userId.toString(), user.username);
     const newRefreshToken = uuidv4();
 
     existingRefreshToken.invalidatedAt = new Date();
