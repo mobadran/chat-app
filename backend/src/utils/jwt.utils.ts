@@ -1,3 +1,4 @@
+import { ACCESS_TOKEN_TTL } from '#constants/auth.js';
 import { configDotenv } from 'dotenv';
 import jwt from 'jsonwebtoken';
 
@@ -7,7 +8,7 @@ const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
 if (!ACCESS_TOKEN_SECRET) {
   throw new Error('ACCESS_TOKEN_SECRET is not defined');
 }
-const ACCESS_EXPIRES_IN = '15m';
+const ACCESS_EXPIRES_IN = ACCESS_TOKEN_TTL / 1000;
 
 export const generateAccessToken = (userId: string) => {
   return jwt.sign({ userId }, ACCESS_TOKEN_SECRET, {

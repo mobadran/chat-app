@@ -3,14 +3,18 @@ import cookieParser from 'cookie-parser';
 import { configDotenv } from 'dotenv';
 import csrf from 'csurf';
 import authRoutes from '#routes/auth.routes.js';
+import errorHandler from '#middlewares/error.middleware.js';
+import { FORBIDDEN } from '#constants/http-status-codes.js';
 
 configDotenv();
 
 const app = express();
 
+// Core Middlewares
 app.use(express.json());
 app.use(cookieParser());
 
+// CSRF Protection
 const csrfProtection = csrf({
   cookie: {
     httpOnly: true,
@@ -28,26 +32,24 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   csrfProtection(req, res, next);
 });
 
+// Routes
 app.get('/api/v1/csrf-token', csrfProtection, (req: Request, res: Response) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
 app.use('/api/v1/auth', authRoutes);
 
+// Error Handling Middlewares
 // CSRF error handler
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-app.use(((err: any, _req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error & { code?: string }, req: Request, res: Response, next: NextFunction) => {
   if (err.code === 'EBADCSRFTOKEN') {
-    return res.status(403).json({ error: 'Invalid CSRF Token' });
+    res.status(FORBIDDEN).json({ error: 'Invalid CSRF Token' });
+  } else {
+    next(err);
   }
-  return next(err);
-}) as express.ErrorRequestHandler);
+});
 
-// General error handler
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-app.use(((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
-}) as express.ErrorRequestHandler);
+// Global error handler
+app.use(errorHandler);
 
 export default app;
