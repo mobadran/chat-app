@@ -2,10 +2,10 @@
   "name": "chat-app-backend",
   "version": "1.0.0",
   "description": "The Backend of Chat App",
-  "main": "index.js",
+  "main": "server.ts",
   "scripts": {
-    "dev": "tsx --watch src/index.ts",
-    "start": "node dist/index.js",
+    "dev": "tsx --watch src/server.ts",
+    "start": "node dist/server.js",
     "build": "tsc"
   },
   "author": "Badraan",
@@ -15,13 +15,24 @@
     "#*": "./src/*"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "csurf": "^1.11.0",
     "dotenv": "^16.5.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.15.1",
+    "node-cron": "^4.1.0",
+    "uuid": "^11.1.0",
+    "zod": "^3.25.62"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
     "@tsconfig/node22": "^22.0.2",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/csurf": "^1.11.5",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^24.0.0",
     "eslint": "^9.28.0",
     "eslint-plugin-perfectionist": "^4.14.0",
