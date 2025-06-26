@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import { configDotenv } from 'dotenv';
+import cors from 'cors';
 import csrf from 'csurf';
 import errorHandler from '#middlewares/error.middleware.js';
 import { FORBIDDEN } from '#constants/http-status-codes.js';
@@ -16,6 +17,12 @@ const app = express();
 // Core Middlewares
 app.use(express.json());
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  }),
+);
 
 // CSRF Protection
 const csrfProtection = csrf({
