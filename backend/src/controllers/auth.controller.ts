@@ -6,7 +6,7 @@ import RefreshToken from '#models/refreshToken.model.js';
 import { generateAccessToken } from '#utils/jwt.utils.js';
 import { BAD_REQUEST, CREATED, FORBIDDEN, OK, UNAUTHORIZED } from '#constants/http-status-codes.js';
 import { ACCESS_TOKEN_COOKIE_OPTIONS, COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_TTL } from '#constants/auth.js';
-import { AUTH_MESSAGES } from '#constants/messages.js';
+
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -14,7 +14,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(BAD_REQUEST).json({ message: AUTH_MESSAGES.USER_EXISTS });
+      res.status(BAD_REQUEST).json({ message: 'User with this email already exists.' });
       return;
     }
 
@@ -36,7 +36,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
     res.cookie('accessToken', accessToken, { ...ACCESS_TOKEN_COOKIE_OPTIONS, maxAge: REFRESH_TOKEN_TTL });
 
-    res.status(CREATED).json({ message: AUTH_MESSAGES.USER_CREATED });
+    res.status(CREATED).json({ message: 'User created successfully.' });
   } catch (error) {
     next(error);
   }
@@ -50,13 +50,13 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     if (!user) {
       // Fake compare to prevent timing attacks
       await bcrypt.compare(password, '$2b$12$PKkzH3hI7ahICMVp3q/.1uEWpVgvhBSbNjlRVTkD8M0UVVsC6G9Qm');
-      res.status(UNAUTHORIZED).json({ message: AUTH_MESSAGES.INVALID_CREDENTIALS });
+      res.status(UNAUTHORIZED).json({ message: 'Invalid email or password.' });
       return;
     }
 
     const isMatch = await bcrypt.compare(password, user.hashedPassword);
     if (!isMatch) {
-      res.status(UNAUTHORIZED).json({ message: AUTH_MESSAGES.INVALID_CREDENTIALS });
+      res.status(UNAUTHORIZED).json({ message: 'Invalid email or password.' });
       return;
     }
 
@@ -75,7 +75,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
     res.cookie('accessToken', accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
 
-    res.status(OK).json({ message: AUTH_MESSAGES.LOGIN_SUCCESS });
+    res.status(OK).json({ message: 'Login successful.' });
   } catch (error) {
     next(error);
   }
@@ -87,25 +87,25 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
 
     const existingRefreshToken = await RefreshToken.findOne({ token: refreshToken, deviceId });
     if (!existingRefreshToken) {
-      res.status(FORBIDDEN).json({ message: AUTH_MESSAGES.INVALID_REFRESH_TOKEN });
+      res.status(FORBIDDEN).json({ message: 'Invalid or expired refresh token.' });
       return;
     }
 
     const user = await User.findById(existingRefreshToken.userId);
     if (!user) {
-      res.status(FORBIDDEN).json({ message: AUTH_MESSAGES.INVALID_REFRESH_TOKEN });
+      res.status(FORBIDDEN).json({ message: 'Invalid or expired refresh token.' });
       return;
     }
 
     if (Date.now() - existingRefreshToken.createdAt.getTime() > REFRESH_TOKEN_TTL) {
-      res.status(FORBIDDEN).json({ message: AUTH_MESSAGES.INVALID_REFRESH_TOKEN });
+      res.status(FORBIDDEN).json({ message: 'Invalid or expired refresh token.' });
       return;
     }
 
     if (existingRefreshToken.invalidatedAt) {
       await RefreshToken.updateMany({ userId: existingRefreshToken.userId }, { $set: { invalidatedAt: new Date() } });
       console.log('Potential refresh token reuse detected for user:', existingRefreshToken.userId);
-      res.status(FORBIDDEN).json({ message: AUTH_MESSAGES.REUSED_REFRESH_TOKEN });
+      res.status(FORBIDDEN).json({ message: 'Potential refresh token reuse detected.' });
       return;
     }
 
@@ -123,7 +123,7 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
     res.cookie('refreshToken', newRefreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
     res.cookie('accessToken', newAccessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
 
-    res.status(OK).json({ message: AUTH_MESSAGES.REFRESH_SUCCESS });
+    res.status(OK).json({ message: 'Tokens refreshed successfully.' });
   } catch (error) {
     next(error);
   }
@@ -141,7 +141,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
     res.clearCookie('accessToken', { path: ACCESS_TOKEN_COOKIE_OPTIONS.path });
     res.clearCookie('deviceId');
 
-    res.status(OK).json({ message: AUTH_MESSAGES.LOGOUT_SUCCESS });
+    res.status(OK).json({ message: 'Logged out successfully.' });
   } catch (error) {
     next(error);
   }
