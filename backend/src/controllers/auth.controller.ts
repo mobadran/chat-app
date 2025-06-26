@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import User, { IUser } from '#models/user.model.js';
 import RefreshToken from '#models/refreshToken.model.js';
 import { generateAccessToken } from '#utils/jwt.utils.js';
-import { BAD_REQUEST, CREATED, FORBIDDEN, OK } from '#constants/http-status-codes.js';
+import { BAD_REQUEST, CREATED, FORBIDDEN, OK, UNAUTHORIZED } from '#constants/http-status-codes.js';
 import { ACCESS_TOKEN_COOKIE_OPTIONS, COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_TTL } from '#constants/auth.js';
 import { AUTH_MESSAGES } from '#constants/messages.js';
 
@@ -50,13 +50,13 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     if (!user) {
       // Fake compare to prevent timing attacks
       await bcrypt.compare(password, '$2b$12$PKkzH3hI7ahICMVp3q/.1uEWpVgvhBSbNjlRVTkD8M0UVVsC6G9Qm');
-      res.status(BAD_REQUEST).json({ message: AUTH_MESSAGES.INVALID_CREDENTIALS });
+      res.status(UNAUTHORIZED).json({ message: AUTH_MESSAGES.INVALID_CREDENTIALS });
       return;
     }
 
     const isMatch = await bcrypt.compare(password, user.hashedPassword);
     if (!isMatch) {
-      res.status(BAD_REQUEST).json({ message: AUTH_MESSAGES.INVALID_CREDENTIALS });
+      res.status(UNAUTHORIZED).json({ message: AUTH_MESSAGES.INVALID_CREDENTIALS });
       return;
     }
 
