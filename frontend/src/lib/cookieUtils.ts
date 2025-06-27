@@ -1,14 +1,3 @@
-// Define a type for the cookie options for clarity
-interface CookieOptions {
-  httpOnly?: boolean;
-  secure?: boolean;
-  sameSite?: 'strict' | 'lax' | 'none' | boolean; // boolean for true/false based on 'None'
-  path?: string;
-  expires?: Date;
-  maxAge?: number; // In seconds
-  domain?: string;
-}
-
 /**
  * Parses an array of raw 'Set-Cookie' header strings into
  * an array of objects suitable for Next.js's `cookies().set()` method.

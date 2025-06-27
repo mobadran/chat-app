@@ -35,7 +35,7 @@ export async function login(formData: FormData) {
         const parsedCookies = parseAndFormatCookies(setCookieHeaders);
         parsedCookies.forEach((cookie) => {
           try {
-            const cookieOptions: any = {
+            const cookieOptions: CookieOptions = {
               httpOnly: cookie.options.httpOnly || false,
               secure: cookie.options.secure || false,
               sameSite: cookie.options.sameSite || 'lax',
