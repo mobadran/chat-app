@@ -7,7 +7,6 @@ import { generateAccessToken } from '#utils/jwt.utils.js';
 import { BAD_REQUEST, CREATED, FORBIDDEN, OK, UNAUTHORIZED } from '#constants/http-status-codes.js';
 import { ACCESS_TOKEN_COOKIE_OPTIONS, COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_TTL } from '#constants/auth.js';
 
-
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password, username, displayName } = req.body;
