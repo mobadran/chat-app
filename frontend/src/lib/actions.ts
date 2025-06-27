@@ -11,7 +11,10 @@ if (!API_URL) {
   console.error('Environment variable API_URL is not set.');
 }
 
-export async function login(formData: FormData) {
+export async function login(
+  _prevState: { error: string | null } | void,
+  formData: FormData
+): Promise<{ error: string | null } | void> {
   const email = formData.get('email');
   const password = formData.get('password');
 
