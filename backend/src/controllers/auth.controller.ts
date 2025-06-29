@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import User, { IUser } from '#models/user.model.js';
 import RefreshToken from '#models/refreshToken.model.js';
 import { generateAccessToken } from '#utils/jwt.utils.js';
-import { BAD_REQUEST, CREATED, FORBIDDEN, OK, UNAUTHORIZED } from '#constants/http-status-codes.js';
+import { CONFLICT, CREATED, FORBIDDEN, OK, UNAUTHORIZED } from '#constants/http-status-codes.js';
 import { ACCESS_TOKEN_TTL, COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_TTL } from '#constants/auth.js';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
@@ -13,7 +13,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(BAD_REQUEST).json({ message: 'User with this email already exists.' });
+      res.status(CONFLICT).json({ message: 'User with this email already exists.' });
       return;
     }
 
