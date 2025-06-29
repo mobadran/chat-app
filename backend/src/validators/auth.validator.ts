@@ -15,7 +15,7 @@ const Register = z.object({
       .string()
       .min(3)
       .max(32)
-      .regex(/^[a-zA-Z0-9_-]+$/),
+      .regex(/^[a-z0-9_]+$/),
     displayName: z.string().min(3).max(32).optional(),
   }),
 });
@@ -25,7 +25,7 @@ const Login = z.object({
     email: z
       .string()
       .email()
-      .or(z.string().regex(/^[a-zA-Z0-9_-]+$/)),
+      .or(z.string().regex(/^[a-z0-9_]+$/)),
     password: z.string(),
   }),
 });
