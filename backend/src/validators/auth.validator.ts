@@ -8,7 +8,7 @@ const Register = z.object({
       .min(8)
       .max(32)
       .regex(
-        /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])(?=^\S+$)./,
+        /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\W])[^\s]{8,}$/,
         'Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and no spaces.',
       ),
     username: z
