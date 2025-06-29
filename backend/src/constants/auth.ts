@@ -12,9 +12,3 @@ export const REFRESH_TOKEN_COOKIE_OPTIONS = {
   path: '/api/v1/auth',
   maxAge: REFRESH_TOKEN_TTL,
 };
-
-export const ACCESS_TOKEN_COOKIE_OPTIONS = {
-  ...COOKIE_OPTIONS,
-  path: '/',
-  maxAge: ACCESS_TOKEN_TTL,
-};

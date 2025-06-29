@@ -4,12 +4,14 @@ import validator from '#validators/auth.validator.js';
 import { ZodError } from 'zod';
 
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies.accessToken;
+  const authorization = req.headers.authorization;
 
-  if (!token) {
+  if (!authorization?.startsWith('Bearer ')) {
     res.status(401).json({ message: 'No access token' });
     return;
   }
+
+  const token = authorization.split(' ')[1];
 
   try {
     const payload = verifyAccessToken(token);

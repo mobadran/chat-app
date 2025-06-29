@@ -5,8 +5,7 @@ import User, { IUser } from '#models/user.model.js';
 import RefreshToken from '#models/refreshToken.model.js';
 import { generateAccessToken } from '#utils/jwt.utils.js';
 import { BAD_REQUEST, CREATED, FORBIDDEN, OK, UNAUTHORIZED } from '#constants/http-status-codes.js';
-import { ACCESS_TOKEN_COOKIE_OPTIONS, COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_TTL } from '#constants/auth.js';
-
+import { ACCESS_TOKEN_TTL, COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_TTL } from '#constants/auth.js';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -34,9 +33,8 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     res.cookie('deviceId', deviceId, COOKIE_OPTIONS);
     res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
-    res.cookie('accessToken', accessToken, { ...ACCESS_TOKEN_COOKIE_OPTIONS, maxAge: REFRESH_TOKEN_TTL });
 
-    res.status(CREATED).json({ message: 'User created successfully.' });
+    res.status(CREATED).json({ message: 'User created successfully.', accessToken, maxAgeAccessTokenMS: ACCESS_TOKEN_TTL });
   } catch (error) {
     next(error);
   }
@@ -73,9 +71,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     await RefreshToken.create({ userId: user._id, deviceId, token: refreshToken });
 
     res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
-    res.cookie('accessToken', accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
 
-    res.status(OK).json({ message: 'Login successful.' });
+    res.status(OK).json({ message: 'Login successful.', accessToken, maxAgeAccessTokenMS: ACCESS_TOKEN_TTL });
   } catch (error) {
     next(error);
   }
@@ -121,9 +118,8 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
     });
 
     res.cookie('refreshToken', newRefreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
-    res.cookie('accessToken', newAccessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
 
-    res.status(OK).json({ message: 'Tokens refreshed successfully.' });
+    res.status(OK).json({ message: 'Tokens refreshed successfully.', accessToken: newAccessToken, maxAgeAccessTokenMS: ACCESS_TOKEN_TTL });
   } catch (error) {
     next(error);
   }
@@ -138,7 +134,6 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
     }
 
     res.clearCookie('refreshToken', { path: REFRESH_TOKEN_COOKIE_OPTIONS.path });
-    res.clearCookie('accessToken', { path: ACCESS_TOKEN_COOKIE_OPTIONS.path });
     res.clearCookie('deviceId');
 
     res.status(OK).json({ message: 'Logged out successfully.' });
