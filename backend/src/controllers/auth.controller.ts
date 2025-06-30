@@ -119,7 +119,14 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
 
     res.cookie('refreshToken', newRefreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
-    res.status(OK).json({ message: 'Tokens refreshed successfully.', accessToken: newAccessToken, maxAgeAccessTokenMS: ACCESS_TOKEN_TTL });
+    res
+      .status(OK)
+      .json({
+        message: 'Tokens refreshed successfully.',
+        accessToken: newAccessToken,
+        maxAgeAccessTokenMS: ACCESS_TOKEN_TTL,
+        maxAgeRefreshTokenMS: REFRESH_TOKEN_TTL,
+      });
   } catch (error) {
     next(error);
   }
