@@ -4,8 +4,8 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogClose
 } from '@/components/ui/dialog';
-import { DialogClose } from '@radix-ui/react-dialog';
 
 export default function ErrorDialog({ message, open, onOpenChange }: { message: string; open: boolean; onOpenChange: (open: boolean) => void }) {
   return (
