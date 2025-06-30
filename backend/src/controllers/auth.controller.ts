@@ -5,7 +5,7 @@ import User, { IUser } from '#models/user.model.js';
 import RefreshToken from '#models/refreshToken.model.js';
 import { generateAccessToken } from '#utils/jwt.utils.js';
 import { CONFLICT, CREATED, FORBIDDEN, OK, UNAUTHORIZED } from '#constants/http-status-codes.js';
-import { ACCESS_TOKEN_TTL, COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_TTL } from '#constants/auth.js';
+import { ACCESS_TOKEN_TTL, REFRESH_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_TTL } from '#constants/auth.js';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -25,13 +25,11 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       displayName: displayName || null,
     });
 
-    const deviceId = uuidv4();
     const refreshToken = uuidv4();
-    await RefreshToken.create({ userId: user._id, token: refreshToken, deviceId });
+    await RefreshToken.create({ userId: user._id, token: refreshToken });
 
     const accessToken = generateAccessToken(user._id.toString(), user.username);
 
-    res.cookie('deviceId', deviceId, COOKIE_OPTIONS);
     res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
     res.status(CREATED).json({ message: 'User created successfully.', accessToken, maxAgeAccessTokenMS: ACCESS_TOKEN_TTL });
@@ -61,14 +59,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const accessToken = generateAccessToken(user._id.toString(), user.username);
     const refreshToken = uuidv4();
 
-    let deviceId = req.cookies.deviceId;
-    if (!deviceId) {
-      deviceId = uuidv4();
-      res.cookie('deviceId', deviceId, COOKIE_OPTIONS);
-    }
-
-    await RefreshToken.updateMany({ userId: user._id, deviceId, invalidatedAt: null }, { $set: { invalidatedAt: new Date() } });
-    await RefreshToken.create({ userId: user._id, deviceId, token: refreshToken });
+    // Invalidate all old refresh tokens
+    await RefreshToken.updateMany({ userId: user._id, invalidatedAt: null }, { $set: { invalidatedAt: new Date() } });
+    await RefreshToken.create({ userId: user._id, token: refreshToken });
 
     res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
@@ -80,9 +73,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 export const refresh = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { refreshToken, deviceId } = req.cookies;
+    const { refreshToken } = req.cookies;
 
-    const existingRefreshToken = await RefreshToken.findOne({ token: refreshToken, deviceId });
+    const existingRefreshToken = await RefreshToken.findOne({ token: refreshToken });
     if (!existingRefreshToken) {
       res.status(FORBIDDEN).json({ message: 'Invalid or expired refresh token.' });
       return;
@@ -113,7 +106,6 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
     await existingRefreshToken.save();
     await RefreshToken.create({
       userId: existingRefreshToken.userId,
-      deviceId,
       token: newRefreshToken,
     });
 
@@ -134,14 +126,13 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
 
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { refreshToken, deviceId } = req.cookies;
-
+    const { refreshToken } = req.cookies;
     if (refreshToken) {
-      await RefreshToken.updateMany({ token: refreshToken, deviceId }, { $set: { invalidatedAt: new Date() } });
+      // Invalidate the refresh token
+      await RefreshToken.updateMany({ token: refreshToken }, { $set: { invalidatedAt: new Date() } });
     }
-
-    res.clearCookie('refreshToken', { path: REFRESH_TOKEN_COOKIE_OPTIONS.path });
-    res.clearCookie('deviceId');
+    // Clear cookies
+    res.clearCookie('refreshToken', REFRESH_TOKEN_COOKIE_OPTIONS);
 
     res.status(OK).json({ message: 'Logged out successfully.' });
   } catch (error) {

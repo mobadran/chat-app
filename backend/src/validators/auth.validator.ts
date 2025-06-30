@@ -33,7 +33,6 @@ const Login = z.object({
 const Refresh = z.object({
   cookies: z.object({
     refreshToken: z.string(),
-    deviceId: z.string(),
   }),
 });
 
