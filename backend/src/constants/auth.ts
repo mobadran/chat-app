@@ -3,13 +3,12 @@ export const ACCESS_TOKEN_TTL = 15 * 60 * 1000; // 15 minutes
 
 export const COOKIE_OPTIONS = {
   httpOnly: true,
-  // secure: process.env.NODE_ENV === 'production',
   secure: true,
   sameSite: 'none' as const,
 };
 
 export const REFRESH_TOKEN_COOKIE_OPTIONS = {
   ...COOKIE_OPTIONS,
-  path: '/api/v1/auth',
+  path: '/',
   maxAge: REFRESH_TOKEN_TTL,
 };
