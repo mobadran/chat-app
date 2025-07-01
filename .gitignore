@@ -1,47 +1,18 @@
+# Certificate
+backend/cert/
+
 # Node & packages
 **/node_modules/
-.pnpm-store/
 
 # Builds
 backend/dist/
 build/
-frontend/.next/
-frontend/.next/cache/
 frontend/out/
-
-# Maps & TypeScript
-*.js.map
-*.tsbuildinfo
 
 # Env
 .env
 .env.local
 .env.*.local
 
-# Tools
-.turbo/
-.vercel/
-
-# Logs & coverage
-logs/
-*.log*
-coverage/
-.nyc_output/
-
 # IDE/OS
 .vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-.DS_Store
-Thumbs.db
-
-# Temp/runtime
-tmp/
-pm2-logs/
-ecosystem.config.*
-
-# Misc
-.sentryclirc
-.eslintcache
-docs/
