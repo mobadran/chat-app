@@ -1,42 +1,39 @@
+import axios from '@/api/axios';
 import ErrorDialog from '@/components/error-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useNavigate } from 'react-router-dom';
 import { useRef, useState } from 'react';
-import axios from '@/api/axios';
+import { useNavigate } from 'react-router-dom';
 
-export default function Register() {
-  const [disabled, setDisabled] = useState(true);
+export default function Login() {
+  const [buttonDisabled, setButtonDisabled] = useState(true);
   const formRef = useRef<HTMLFormElement>(null);
   const [open, setOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
+  const from = location.state?.from?.pathname || '/';
 
   async function sendFormData(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setDisabled(true);
+    setButtonDisabled(true);
     const formData = new FormData(e.currentTarget);
-    const username = formData.get('username');
     const email = formData.get('email');
     const password = formData.get('password');
-    const displayName = formData.get('displayName');
 
     try {
       const response = await axios.post(
-        '/api/v1/auth/register',
+        `${import.meta.env.VITE_BACKEND_API}/api/v1/auth/login`,
         {
-          username,
           email,
           password,
-          displayName,
         },
         {
           withCredentials: true,
         },
       );
 
-      if (response.status === 201) {
-        navigate('/');
+      if (response.status === 200) {
+        navigate(from, { replace: true });
         return;
       }
 
@@ -45,7 +42,7 @@ export default function Register() {
     } catch (err: any) {
       showErrorMessage(err.response.data.message);
     } finally {
-      setDisabled(false);
+      setButtonDisabled(false);
     }
   }
 
@@ -60,28 +57,22 @@ export default function Register() {
         onSubmit={sendFormData}
         onChange={() => {
           if (formRef.current?.checkValidity()) {
-            setDisabled(false);
+            setButtonDisabled(false);
           }
         }}
         ref={formRef}
         method="POST"
         className="bg-accent form flex w-full max-w-100 flex-col items-stretch gap-4 rounded-lg p-4"
       >
-        <h1 className="text-center text-2xl font-bold">Register</h1>
+        <h1 className="text-center text-2xl font-bold">Login</h1>
         <Input
           type="text"
-          name="username"
-          placeholder="Username"
-          minLength={3}
-          maxLength={32}
-          pattern="^[a-z0-9_]+$"
-          title="Username must be 3~32 characters long and contain only letters, numbers, or underscores"
+          name="email"
+          placeholder="Email/Username"
+          title="Enter your email address or username"
           required
         />
-        <p>Username must be 3~32 characters long and contain only letters, numbers, or underscores</p>
-        <Input type="email" name="email" placeholder="Email" title="Please enter a valid email address" required />
 
-        <p>Please enter a valid email address</p>
         <Input
           type="password"
           name="password"
@@ -89,23 +80,11 @@ export default function Register() {
           minLength={8}
           maxLength={32}
           pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)[^\s]{8,}$"
-          title="Password must be 8~32 characters long and include at least one uppercase letter, one lowercase letter, one digit, one special character, and no spaces"
+          title="Enter your password"
           required
         />
-        <p>
-          Password must be 8~32 characters long and include at least one uppercase letter, one lowercase letter, one
-          digit, one special character, and no spaces
-        </p>
-        <Input
-          type="text"
-          name="displayName"
-          pattern=".{3,32}"
-          title="Display name must be 3~32 characters long"
-          placeholder="Display Name (optional)"
-        />
-        <p>Display name must be 3~32 characters long</p>
-        <Button type="submit" disabled={disabled}>
-          Register
+        <Button type="submit" disabled={buttonDisabled}>
+          Login
         </Button>
       </form>
       <ErrorDialog message={errorMessage} open={open} onOpenChange={setOpen} />

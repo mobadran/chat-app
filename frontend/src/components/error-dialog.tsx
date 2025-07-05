@@ -14,8 +14,8 @@ export default function ErrorDialog({ message, open, onOpenChange }: { message: 
         <DialogHeader>
           <DialogTitle>Error</DialogTitle>
         </DialogHeader>
-        <DialogDescription>
-          <p className="text-center text-red-500">{message}</p>
+        <DialogDescription className='text-center text-red-500'>
+          {message}
         </DialogDescription>
         <DialogClose className="btn">Got It</DialogClose>
       </DialogContent>

@@ -1,13 +1,12 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import Header from '@/components/header';
+import ConversationList from '@/components/conversation-list';
 
 function App() {
-  const [state, setState] = useState(0);
   return (
-    <div className='flex flex-col items-center h-screen justify-center gap-4'>
-      <h1>Chat App</h1>
-      <Button onClick={() => setState(state + 1)}>{state}</Button>
-    </div>
+    <>
+      <Header />
+      <ConversationList />
+    </>
   );
 }
 
