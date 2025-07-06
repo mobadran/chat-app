@@ -3,7 +3,7 @@ import ErrorDialog from '@/components/error-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function Login() {
   const [buttonDisabled, setButtonDisabled] = useState(true);
@@ -11,7 +11,8 @@ export default function Login() {
   const [open, setOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-  const from = location.state?.from?.pathname || '/';
+  const location = useLocation();
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
 
   async function sendFormData(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
