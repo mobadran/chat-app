@@ -9,7 +9,6 @@ export default function useRefreshToken() {
         withCredentials: true,
       });
       setAccessToken(response.data.accessToken);
-      console.log(response.data.accessToken);
       return response.data.accessToken;
     } catch (error) {
       console.error('Refresh token failed:', error);

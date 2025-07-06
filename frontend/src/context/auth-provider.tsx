@@ -17,7 +17,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const updateAccessToken = useCallback((token: string | null) => {
     setAccessToken(token);
-    console.log('Access Token updated:', token ? 'Set' : 'Null');
   }, []);
 
   const authContextValue = {
