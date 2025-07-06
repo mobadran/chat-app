@@ -20,6 +20,11 @@ const ConversationSchema: Schema = new Schema<IConversation>(
   { timestamps: true },
 );
 
+ConversationSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+  await mongoose.model('ConversationMember').deleteMany({ conversationId: this._id });
+  next();
+});
+
 const Conversation: Model<IConversation> = mongoose.model<IConversation>('Conversation', ConversationSchema);
 
 export default Conversation;
