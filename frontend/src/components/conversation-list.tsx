@@ -19,7 +19,9 @@ export default function ConversationList() {
       })
       .catch((error) => {
         console.error('Failed to fetch conversations:', error);
-        navigate('/login', { state: { from: location }, replace: true });
+        if (error.response?.status === 401) {
+          navigate('/login', { state: { from: location }, replace: true });
+        }
       });
     // eslint-disable-next-line
   }, []);

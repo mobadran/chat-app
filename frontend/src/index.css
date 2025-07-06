@@ -120,15 +120,15 @@
 }
 
 .btn {
-  @apply px-4 py-2 rounded-md hover:opacity-90 outline-none cursor-pointer bg-primary text-primary-foreground;
+  @apply bg-primary text-primary-foreground cursor-pointer rounded-md px-4 py-2 hover:opacity-90;
 }
 
 .btn-outline {
-  @apply px-4 py-2 rounded-md hover:opacity-90 outline-none cursor-pointer border-primary text-primary bg-none border;
+  @apply border-primary text-primary cursor-pointer rounded-md border bg-none px-4 py-2 hover:opacity-90;
 }
 
 .form p {
-  @apply text-xs text-muted-foreground hidden;
+  @apply text-muted-foreground hidden text-xs;
 }
 
 .form input:invalid:not(:placeholder-shown) + p {
