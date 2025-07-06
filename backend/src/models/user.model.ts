@@ -21,6 +21,7 @@ const UserSchema: Schema = new Schema<IUser>(
     hashedPassword: {
       type: String,
       required: true,
+      select: false,
     },
     username: {
       type: String,

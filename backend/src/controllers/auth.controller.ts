@@ -42,7 +42,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   try {
     const { email, password } = req.body;
 
-    const user = (await User.findOne({ $or: [{ email }, { username: email }] })) as IUser;
+    const user = (await User.findOne({ $or: [{ email }, { username: email }] }).select('+hashedPassword')) as IUser;
     if (!user) {
       // Fake compare to prevent timing attacks
       await bcrypt.compare(password, '$2b$12$PKkzH3hI7ahICMVp3q/.1uEWpVgvhBSbNjlRVTkD8M0UVVsC6G9Qm');
@@ -111,14 +111,12 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
 
     res.cookie('refreshToken', newRefreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
-    res
-      .status(OK)
-      .json({
-        message: 'Tokens refreshed successfully.',
-        accessToken: newAccessToken,
-        maxAgeAccessTokenMS: ACCESS_TOKEN_TTL,
-        maxAgeRefreshTokenMS: REFRESH_TOKEN_TTL,
-      });
+    res.status(OK).json({
+      message: 'Tokens refreshed successfully.',
+      accessToken: newAccessToken,
+      maxAgeAccessTokenMS: ACCESS_TOKEN_TTL,
+      maxAgeRefreshTokenMS: REFRESH_TOKEN_TTL,
+    });
   } catch (error) {
     next(error);
   }
