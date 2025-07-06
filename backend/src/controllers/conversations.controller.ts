@@ -53,8 +53,10 @@ export const createConversation = async (req: Request, res: Response, next: Next
 export const getConversations = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const conversations = await ConversationMember.find({ userId: req.user!.id }).select('conversationId').populate('conversationId');
+
+    const filteredConversations = conversations.filter((c) => c.conversationId !== null);
     res.status(OK).json(
-      conversations.map((c) => {
+      filteredConversations.map((c) => {
         const populatedConversation = c.conversationId as IConversation & Document;
 
         return {
