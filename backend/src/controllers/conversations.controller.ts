@@ -70,3 +70,13 @@ export const getConversations = async (req: Request, res: Response, next: NextFu
     next(error);
   }
 };
+
+export const getConversation = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const conversation = await Conversation.findById(req.params.id);
+    const conversationMembers = await ConversationMember.find({ conversationId: req.params.id }).populate('userId');
+    res.status(OK).json({ conversation, conversationMembers });
+  } catch (error) {
+    next(error);
+  }
+};
