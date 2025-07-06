@@ -13,26 +13,33 @@ import CreateConversationUserList from './create-conversation-user-list';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function CreateConversationButton() {
   const axiosPrivate = useAxiosPrivate();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [name, setName] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: (data: { members: string[]; name: string }) =>
+      axiosPrivate.post('/api/v1/conversations', {
+        members: data.members,
+        name: data.name,
+        type: data.members.length === 1 ? 'direct' : 'group',
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      setIsDialogOpen(false);
+    },
+  });
   const createConversation = () => {
     if (selectedItems.length === 0) return;
-    axiosPrivate
-      .post('/api/v1/conversations', {
-        members: selectedItems,
-        name,
-        type: selectedItems.length === 1 ? 'direct' : 'group',
-      })
-      .then(() => {
-        setSelectedItems([]);
-        setName('');
-      });
+    mutation.mutate({ members: selectedItems, name });
   };
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger className="btn">Create Conversation</DialogTrigger>
       <DialogContent>
         <DialogHeader>

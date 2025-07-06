@@ -3,3 +3,8 @@ type Conversation = {
   type: string;
   name: string;
 };
+
+type ConversationMember = {
+  _id: string;
+  userId: Member;
+};

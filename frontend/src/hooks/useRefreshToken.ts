@@ -9,9 +9,10 @@ export default function useRefreshToken() {
         withCredentials: true,
       });
       setAccessToken(response.data.accessToken);
+      console.log('✅ Refreshed');
       return response.data.accessToken;
     } catch (error) {
-      console.error('Refresh token failed:', error);
+      console.error('❌ Refresh token failed:', error);
       return null;
     }
   };
