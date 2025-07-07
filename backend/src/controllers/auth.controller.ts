@@ -60,7 +60,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const refreshToken = uuidv4();
 
     // Invalidate all old refresh tokens
-    await RefreshToken.updateMany({ userId: user._id, invalidatedAt: null }, { $set: { invalidatedAt: new Date() } });
+    // await RefreshToken.updateMany({ userId: user._id, invalidatedAt: null }, { $set: { invalidatedAt: new Date() } });
     await RefreshToken.create({ userId: user._id, token: refreshToken });
 
     res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
