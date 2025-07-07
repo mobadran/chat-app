@@ -1,13 +1,14 @@
 import useAxiosPrivate from '@/hooks/useAxiosPrivate';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
-export default function ConversationList() {
+export default function ConversationList({
+  setCurrentConversation,
+}: {
+  setCurrentConversation: (conversationId: string) => void;
+}) {
   const axiosPrivate = useAxiosPrivate();
-  const navigate = useNavigate();
-  const location = useLocation();
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['conversations'],
     queryFn: () => axiosPrivate.get('/api/v1/conversations').then((response) => response.data),
   });
@@ -15,17 +16,26 @@ export default function ConversationList() {
   if (isLoading) return <p>Loading...</p>;
 
   if (isError) {
-    console.error('Failed to fetch conversations:', data?.error);
-    if (data?.error?.response?.status === 401) {
-      navigate('/login', { state: { from: location }, replace: true });
-    }
+    console.error('Failed to fetch conversations:', error);
   }
 
   return (
-    <ul>
+    <ul className="flex flex-col gap-2">
       {data?.map((conversation: Conversation) => (
         <li key={conversation._id}>
-          <Link to={`/conversations/${conversation._id}`}>{conversation.name}</Link>
+          <button
+            onClick={() => setCurrentConversation(conversation._id)}
+            className="flex w-full items-center gap-2 border-b p-2 hover:cursor-pointer"
+          >
+            <img
+              src={
+                conversation.image || 'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'
+              }
+              alt={conversation.name}
+              className="h-10 w-10 rounded-full"
+            />
+            {conversation.name}
+          </button>
         </li>
       )) || <p>No conversations found</p>}
     </ul>

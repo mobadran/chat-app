@@ -1,7 +1,7 @@
 import ErrorDialog from '@/components/error-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useRef, useState } from 'react';
 import axios from '@/api/axios';
 
@@ -107,6 +107,12 @@ export default function Register() {
         <Button type="submit" disabled={disabled}>
           Register
         </Button>
+        <span>
+          Already have an account?{' '}
+          <Link to="/login" className="text-primary underline">
+            Login
+          </Link>
+        </span>
       </form>
       <ErrorDialog message={errorMessage} open={open} onOpenChange={setOpen} />
     </main>

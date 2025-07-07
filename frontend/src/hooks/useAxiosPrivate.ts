@@ -2,10 +2,12 @@ import { axiosPrivate } from '@/api/axios';
 import { useEffect } from 'react';
 import { useAuth } from '@/context/auth-provider';
 import useRefreshToken from '@/hooks/useRefreshToken';
+import { useNavigate } from 'react-router-dom';
 
 export default function useAxiosPrivate() {
   const { accessToken } = useAuth();
   const refresh = useRefreshToken();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const requestIntercept = axiosPrivate.interceptors.request.use(
@@ -27,6 +29,10 @@ export default function useAxiosPrivate() {
         if (error?.response?.status === 403 && !prevRequest?.sent) {
           prevRequest.sent = true;
           const newAccessToken = await refresh();
+          if (!newAccessToken) {
+            navigate('/login', { replace: true });
+            return Promise.reject(error);
+          }
           prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
           return axiosPrivate(prevRequest);
         }
@@ -38,7 +44,7 @@ export default function useAxiosPrivate() {
       axiosPrivate.interceptors.response.eject(responseIntercept);
       axiosPrivate.interceptors.request.eject(requestIntercept);
     };
-  }, [accessToken, refresh]);
+  }, [accessToken, refresh, navigate]);
 
   return axiosPrivate;
 }

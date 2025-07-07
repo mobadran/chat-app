@@ -3,7 +3,7 @@ import ErrorDialog from '@/components/error-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRef, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 export default function Login() {
   const [buttonDisabled, setButtonDisabled] = useState(true);
@@ -87,6 +87,12 @@ export default function Login() {
         <Button type="submit" disabled={buttonDisabled}>
           Login
         </Button>
+        <span>
+          Don&apos;t have an account?{' '}
+          <Link to="/register" className="text-primary underline">
+            Register
+          </Link>
+        </span>
       </form>
       <ErrorDialog message={errorMessage} open={open} onOpenChange={setOpen} />
     </main>
