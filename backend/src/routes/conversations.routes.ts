@@ -9,6 +9,6 @@ router.post('/conversations', authenticateToken, validate(converationsValidator.
 
 router.get('/conversations', authenticateToken, getConversations);
 
-router.get('/conversations/:id', authenticateToken, getConversation);
+router.get('/conversations/:id', authenticateToken, validate(converationsValidator.GetConversation), getConversation);
 
 export default router;

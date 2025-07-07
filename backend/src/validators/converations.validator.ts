@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ObjectId } from './custom.validator.js';
 
 const CreateConversation = z.object({
   body: z.object({
@@ -13,4 +14,10 @@ const CreateConversation = z.object({
   }),
 });
 
-export default { CreateConversation };
+const GetConversation = z.object({
+  params: z.object({
+    id: ObjectId,
+  }),
+});
+
+export default { CreateConversation, GetConversation };
