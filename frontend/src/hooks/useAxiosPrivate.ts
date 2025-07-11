@@ -26,15 +26,22 @@ export default function useAxiosPrivate() {
       (response) => response,
       async (error) => {
         const prevRequest = error?.config;
-        if (error?.response?.status === 403 && !prevRequest?.sent) {
-          prevRequest.sent = true;
-          const newAccessToken = await refresh();
-          if (!newAccessToken) {
+        // Handle both 401 (Unauthorized) and 403 (Forbidden) status codes
+        if ((error?.response?.status === 401 || error?.response?.status === 403) && !prevRequest?._retry) {
+          prevRequest._retry = true;
+          try {
+            const newAccessToken = await refresh();
+            if (!newAccessToken) {
+              navigate('/login', { replace: true });
+              return Promise.reject(error);
+            }
+            prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+            return axiosPrivate(prevRequest);
+          } catch (refreshError) {
+            // If refresh token fails, redirect to login
             navigate('/login', { replace: true });
-            return Promise.reject(error);
+            return Promise.reject(refreshError);
           }
-          prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-          return axiosPrivate(prevRequest);
         }
         return Promise.reject(error);
       },
