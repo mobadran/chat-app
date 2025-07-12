@@ -25,7 +25,7 @@ export default function ConversationList({
         <li key={conversation._id}>
           <button
             onClick={() => setCurrentConversation(conversation._id)}
-            className="flex w-full items-center gap-2 border-b p-2 hover:cursor-pointer"
+            className="flex w-full items-center gap-2 border-b p-2 text-start hover:cursor-pointer"
           >
             <img
               src={

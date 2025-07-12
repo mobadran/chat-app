@@ -3,17 +3,25 @@ import Conversation from '@/components/conversation';
 import { useState } from 'react';
 import Header from '@/components/header';
 import SideBar from '@/components/side-bar';
+import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from '@/components/ui/resizable';
 
 function App() {
   const [currentConversation, setCurrentConversation] = useState<string | null>(null);
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden">
       <SideBar />
-      <div className="flex basis-1/3 flex-col">
-        <Header />
-        <ConversationList setCurrentConversation={setCurrentConversation} />
-      </div>
-      <Conversation currentConversation={currentConversation} />
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel minSize={0} maxSize={33}>
+          <div className="flex flex-col">
+            <Header />
+            <ConversationList setCurrentConversation={setCurrentConversation} />
+          </div>
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel>
+          <Conversation currentConversation={currentConversation} />
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   );
 }

@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { CirclePlus } from 'lucide-react';
 
 export default function CreateConversationButton() {
   const axiosPrivate = useAxiosPrivate();
@@ -40,7 +41,9 @@ export default function CreateConversationButton() {
   };
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger className="btn">Create Conversation</DialogTrigger>
+      <DialogTrigger className="hover:cursor-pointer">
+        <CirclePlus />
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create Conversation</DialogTitle>

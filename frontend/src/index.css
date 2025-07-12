@@ -117,28 +117,27 @@
   body {
     @apply bg-background text-foreground;
   }
-}
+  .btn {
+    @apply bg-primary text-primary-foreground cursor-pointer rounded-md px-4 py-2 hover:opacity-90;
+  }
 
-.btn {
-  @apply bg-primary text-primary-foreground cursor-pointer rounded-md px-4 py-2 hover:opacity-90;
-}
+  .btn-outline {
+    @apply border-primary text-primary cursor-pointer rounded-md border bg-none px-4 py-2 hover:opacity-90;
+  }
 
-.btn-outline {
-  @apply border-primary text-primary cursor-pointer rounded-md border bg-none px-4 py-2 hover:opacity-90;
-}
+  .form p {
+    @apply text-muted-foreground hidden text-xs;
+  }
 
-.form p {
-  @apply text-muted-foreground hidden text-xs;
-}
+  .form input:invalid:not(:placeholder-shown) + p {
+    @apply block;
+  }
 
-.form input:invalid:not(:placeholder-shown) + p {
-  @apply block;
-}
+  .form input:invalid:not(:placeholder-shown) {
+    @apply border-destructive;
+  }
 
-.form input:invalid:not(:placeholder-shown) {
-  @apply border-destructive;
-}
-
-.form input:valid:not(:placeholder-shown) {
-  @apply border-primary;
+  .form input:valid:not(:placeholder-shown) {
+    @apply border-primary;
+  }
 }

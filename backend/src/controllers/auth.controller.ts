@@ -28,7 +28,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     const refreshToken = uuidv4();
     await RefreshToken.create({ userId: user._id, token: refreshToken });
 
-    const accessToken = generateAccessToken(user._id.toString(), user.username);
+    const accessToken = generateAccessToken(user._id.toString(), user.username, user.displayName);
 
     res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
@@ -56,7 +56,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
 
-    const accessToken = generateAccessToken(user._id.toString(), user.username);
+    const accessToken = generateAccessToken(user._id.toString(), user.username, user.displayName);
     const refreshToken = uuidv4();
 
     // Invalidate all old refresh tokens
@@ -94,12 +94,12 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
 
     if (existingRefreshToken.invalidatedAt) {
       await RefreshToken.updateMany({ userId: existingRefreshToken.userId }, { $set: { invalidatedAt: new Date() } });
-      console.log('Potential refresh token reuse detected for user:', existingRefreshToken.userId);
+      console.log('Potential refresh token reuse detected for user:', existingRefreshToken.userId, refreshToken);
       res.status(FORBIDDEN).json({ message: 'Potential refresh token reuse detected.' });
       return;
     }
 
-    const newAccessToken = generateAccessToken(existingRefreshToken.userId.toString(), user.username);
+    const newAccessToken = generateAccessToken(existingRefreshToken.userId.toString(), user.username, user.displayName);
     const newRefreshToken = uuidv4();
 
     existingRefreshToken.invalidatedAt = new Date();
