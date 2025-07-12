@@ -7,8 +7,9 @@ import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from '@/componen
 
 function App() {
   const [currentConversation, setCurrentConversation] = useState<string | null>(null);
+  const [conversationSize, setConversationSize] = useState(66);
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen">
       <SideBar />
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel minSize={0} maxSize={33}>
@@ -18,8 +19,12 @@ function App() {
           </div>
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel>
-          <Conversation currentConversation={currentConversation} />
+        <ResizablePanel
+          onResize={(size) => {
+            setConversationSize(size);
+          }}
+        >
+          <Conversation currentConversation={currentConversation} conversationSize={conversationSize} />
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

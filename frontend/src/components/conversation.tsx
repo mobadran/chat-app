@@ -3,11 +3,18 @@ import useSocket from '@/hooks/useSocket';
 import type { Message } from '@/types/message';
 import { useQuery } from '@tanstack/react-query';
 import { Send } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export default function Conversation({ currentConversation }: { currentConversation: string | null }) {
+export default function Conversation({
+  currentConversation,
+  conversationSize,
+}: {
+  currentConversation: string | null;
+  conversationSize: number;
+}) {
   const axiosPrivate = useAxiosPrivate();
   const [message, setMessage] = useState('');
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { newMessages, sendMessage } = useMessages(currentConversation!);
 
@@ -63,7 +70,7 @@ export default function Conversation({ currentConversation }: { currentConversat
   }
 
   return (
-    <div className="relative flex grow flex-col overflow-y-auto border-l">
+    <div className="relative flex h-screen flex-col border-l">
       {/* Convo Metadata */}
       <div className="bg-sidebar flex items-center gap-2 p-2">
         <img
@@ -85,7 +92,7 @@ export default function Conversation({ currentConversation }: { currentConversat
         </div>
       </div>
       {/* Messages */}
-      <div className="flex grow flex-col gap-2 p-2">
+      <div className="flex grow flex-col gap-2 overflow-y-auto p-2">
         {allMessages?.map((message: Message, index: number) => (
           <div key={index} className="flex items-center gap-2 border-b">
             <h3 className="font-semibold">{message.senderInfo.displayName}:</h3>
@@ -96,16 +103,13 @@ export default function Conversation({ currentConversation }: { currentConversat
       {/* Input */}
       <form
         onSubmit={handleSendMessage}
-        className="bg-accent fixed bottom-2 flex items-center gap-2 rounded-full px-6 py-3"
+        style={{
+          left: `calc(${100 - conversationSize}% + 64px)`,
+        }}
+        className="bg-accent fixed right-8 bottom-2 flex items-center gap-2 rounded-4xl px-6 py-3"
       >
-        <input
-          type="text"
-          className="border-input flex-1 rounded-md border p-2"
-          placeholder="Type a message..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <button type="submit" className="rounded-md border p-2">
+        <MessageInput buttonRef={buttonRef} message={message} setMessage={setMessage} />
+        <button type="submit" className="self-end rounded-md border p-2" ref={buttonRef}>
           <Send />
         </button>
       </form>
@@ -119,7 +123,6 @@ function useMessages(conversationId: string) {
 
   useEffect(() => {
     function handleNewMessage(message: Message) {
-      console.log(message.conversationId, conversationId);
       if (message.conversationId !== conversationId) return;
       setNewMessages((prev) => [...prev, message]);
     }
@@ -145,4 +148,39 @@ function useMessages(conversationId: string) {
   };
 
   return { newMessages, sendMessage };
+}
+
+function MessageInput({
+  buttonRef,
+  message,
+  setMessage,
+}: {
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
+  message: string;
+  setMessage: (message: string) => void;
+}) {
+  return (
+    <textarea
+      className="border-input h-auto flex-1 resize-none rounded-md border p-2"
+      rows={1}
+      placeholder="Type a message..."
+      value={message}
+      onInput={(e) => {
+        const getLineCount = (text: string) => {
+          const lines = text.split('\n');
+          return lines.length;
+        };
+        setMessage(e.currentTarget.value);
+        const lineCount = getLineCount(e.currentTarget.value);
+        if (lineCount > 9) return;
+        e.currentTarget.style.height = 44 + (lineCount - 1) * 24 + 'px';
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          buttonRef?.current?.click();
+        }
+      }}
+    ></textarea>
+  );
 }
