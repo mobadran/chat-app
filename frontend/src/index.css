@@ -140,4 +140,25 @@
   .form input:valid:not(:placeholder-shown) {
     @apply border-primary;
   }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    @apply bg-sidebar;
+    border-radius: 22px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    @apply bg-sidebar-accent;
+    border-radius: 22px;
+    border: 1px solid #232e33;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
+    }
+  }
 }

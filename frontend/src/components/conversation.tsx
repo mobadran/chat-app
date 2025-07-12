@@ -70,7 +70,7 @@ export default function Conversation({
   }
 
   return (
-    <div className="relative flex h-screen flex-col border-l">
+    <div className="relative flex h-screen flex-col border-l pb-14">
       {/* Convo Metadata */}
       <div className="bg-sidebar flex items-center gap-2 p-2">
         <img
@@ -92,10 +92,10 @@ export default function Conversation({
         </div>
       </div>
       {/* Messages */}
-      <div className="flex grow flex-col gap-2 overflow-y-auto p-2">
+      <div className="flex grow flex-col gap-2 overflow-y-auto p-5 pb-8">
         {allMessages?.map((message: Message, index: number) => (
-          <div key={index} className="flex items-center gap-2 border-b">
-            <h3 className="font-semibold">{message.senderInfo.displayName}:</h3>
+          <div key={index} className="flex gap-2 border-b">
+            <h3 className="font-semibold text-nowrap">{message.senderInfo.displayName}</h3>
             <p>{message.content}</p>
           </div>
         ))}
@@ -104,7 +104,7 @@ export default function Conversation({
       <form
         onSubmit={handleSendMessage}
         style={{
-          left: `calc(${100 - conversationSize}% + 64px)`,
+          left: `calc(${conversationSize}% + 64px)`,
         }}
         className="bg-accent fixed right-8 bottom-2 flex items-center gap-2 rounded-4xl px-6 py-3"
       >
@@ -178,6 +178,7 @@ function MessageInput({
       onKeyDown={(e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
+          e.currentTarget.style.height = 'auto';
           buttonRef?.current?.click();
         }
       }}
