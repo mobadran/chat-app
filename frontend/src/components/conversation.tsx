@@ -1,5 +1,5 @@
 import useAxiosPrivate from '@/hooks/useAxiosPrivate';
-import useSocket from '@/hooks/useSocket';
+import useSocket from '@/context/socket-provider';
 import type { Message } from '@/types/message';
 import { useQuery } from '@tanstack/react-query';
 import { Send } from 'lucide-react';
@@ -13,6 +13,7 @@ export default function Conversation({
   conversationSize: number;
 }) {
   const axiosPrivate = useAxiosPrivate();
+  const { socket, connected: socketConnected } = useSocket();
   const [message, setMessage] = useState('');
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -31,10 +32,16 @@ export default function Conversation({
     enabled: !!currentConversation,
   });
 
-  // const sendMessageMutation = useMutation({
-  //   mutationFn: (data: { conversationId: string; message: string }) =>
-  //     axiosPrivate.post(`/api/v1/conversations/${data.conversationId}/messages`, { content: data.message }),
-  // });
+  useEffect(() => {
+    if (!socketConnected || !socket || !currentConversation) return;
+    socket.emit('join-room', currentConversation, (success: boolean) => {
+      if (!success) {
+        console.error('Failed to join room');
+        return;
+      }
+    });
+    // eslint-disable-next-line
+  }, [currentConversation, socketConnected]);
 
   const allMessages = [...(messages.data || []), ...newMessages];
 
@@ -140,10 +147,21 @@ function useMessages(conversationId: string) {
 
   const sendMessage = (content: string) => {
     if (socket && conversationId && content.trim()) {
-      socket.emit('send-message', {
-        conversationId,
-        content,
-      });
+      socket.emit(
+        'send-message',
+        {
+          conversationId,
+          content,
+        },
+        (success: boolean, message: Message) => {
+          if (!success) {
+            console.error('Failed to send message');
+            return;
+          } else {
+            setNewMessages((prev) => [...prev, message]);
+          }
+        },
+      );
     }
   };
 

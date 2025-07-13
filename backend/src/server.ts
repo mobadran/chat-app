@@ -5,7 +5,7 @@ import { startRefreshTokenCleanup } from '#utils/cleanupTokens.utils.js';
 import fs from 'fs';
 import https from 'https';
 import { Server } from 'socket.io';
-import { setupSocketIO } from '#utils/socket.utils.js';
+import { setupSocketIO } from '#socket.js';
 
 configDotenv();
 const PORT = process.env.PORT || 8001;

@@ -1,10 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { Socket } from 'socket.io-client';
 import { createSocket } from '@/lib/socket';
 import { useAuth } from '@/context/auth-provider';
 import useRefreshToken from '@/hooks/useRefreshToken';
-import { Socket } from 'socket.io-client';
 
-export default function useSocket() {
+type SocketContextType = {
+  socket: Socket | null;
+  connected: boolean;
+};
+
+const SocketContext = createContext<SocketContextType>({
+  socket: null,
+  connected: false,
+});
+
+export function SocketProvider({ children }: { children: React.ReactNode }) {
   const { accessToken } = useAuth();
   const refresh = useRefreshToken();
   const socketRef = useRef<Socket | null>(null);
@@ -15,8 +25,6 @@ export default function useSocket() {
 
     const setupSocket = async () => {
       let token = accessToken;
-
-      // Initial refresh if token is missing (e.g., on page reload)
       if (!token) {
         token = await refresh();
         if (!token || !active) return;
@@ -28,14 +36,11 @@ export default function useSocket() {
       socket.on('connect', () => setConnected(true));
       socket.on('disconnect', () => setConnected(false));
 
-      // If server says "unauthorized", refresh and reconnect
       socket.on('unauthorized', async () => {
         const newToken = await refresh();
         if (newToken && active) {
-          socket.auth = {
-            token: `Bearer ${newToken}`,
-          };
-          socket.connect(); // reconnect with fresh token
+          socket.auth = { token: `Bearer ${newToken}` };
+          socket.connect();
         }
       });
 
@@ -49,7 +54,12 @@ export default function useSocket() {
       socketRef.current?.disconnect();
     };
     // eslint-disable-next-line
-  }, []);
+  }, [accessToken]);
 
-  return { socket: socketRef.current, connected };
+  return <SocketContext.Provider value={{ socket: socketRef.current, connected }}>{children}</SocketContext.Provider>;
+}
+
+// eslint-disable-next-line
+export default function useSocket() {
+  return useContext(SocketContext);
 }
