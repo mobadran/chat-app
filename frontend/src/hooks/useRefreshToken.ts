@@ -20,7 +20,6 @@ export default function useRefreshToken() {
 
         const newAccessToken = response.data.accessToken;
         setAccessToken(newAccessToken);
-        console.log('✅ Refreshed');
         return newAccessToken;
       } catch (error) {
         console.error('❌ Refresh token failed:', error);

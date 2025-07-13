@@ -22,7 +22,6 @@ export default function useSocket() {
         if (!token || !active) return;
       }
 
-      console.log('Creating socket,', token);
       const socket = createSocket(token);
       socketRef.current = socket;
 

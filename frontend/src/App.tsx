@@ -7,12 +7,12 @@ import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from '@/componen
 
 function App() {
   const [currentConversation, setCurrentConversation] = useState<string | null>(null);
-  const [conversationListSize, setConversationListSize] = useState(33);
+  const [conversationListSize, setConversationListSize] = useState(20);
   return (
     <div className="flex h-screen">
       <SideBar />
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel minSize={0} maxSize={33} onResize={(size) => setConversationListSize(size)}>
+        <ResizablePanel minSize={0} maxSize={33} defaultSize={20} onResize={(size) => setConversationListSize(size)}>
           <div className="flex flex-col">
             <Header />
             <ConversationList setCurrentConversation={setCurrentConversation} />
