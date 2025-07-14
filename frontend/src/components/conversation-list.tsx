@@ -1,5 +1,6 @@
 import useAxiosPrivate from '@/hooks/useAxiosPrivate';
 import { useQuery } from '@tanstack/react-query';
+import { Skeleton } from './ui/skeleton';
 
 export default function ConversationList({
   setCurrentConversation,
@@ -13,7 +14,15 @@ export default function ConversationList({
     queryFn: () => axiosPrivate.get('/api/v1/conversations').then((response) => response.data),
   });
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-2 p-2">
+        {Array.from({ length: 10 }).map((_, index) => (
+          <Skeleton key={index} className="h-12 w-full" />
+        ))}
+      </div>
+    );
+  }
 
   if (isError) {
     console.error('Failed to fetch conversations:', error);

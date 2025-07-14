@@ -2,8 +2,9 @@ import useAxiosPrivate from '@/hooks/useAxiosPrivate';
 import useSocket from '@/context/socket-provider';
 import type { Message } from '@/types/message';
 import { useQuery } from '@tanstack/react-query';
-import { Send } from 'lucide-react';
+import { MessageSquare, Send } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { Skeleton } from './ui/skeleton';
 
 export default function Conversation({
   currentConversation,
@@ -54,6 +55,7 @@ export default function Conversation({
   if (!currentConversation) {
     return (
       <div className="flex h-screen flex-col items-center justify-center">
+        <MessageSquare className="text-muted-foreground h-10 w-10" />
         <p>Select a conversation</p>
       </div>
     );
@@ -61,8 +63,23 @@ export default function Conversation({
 
   if (conversation.isLoading) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center">
-        <p>Loading conversation...</p>
+      <div className="flex h-screen flex-col justify-center">
+        <div className="bg-sidebar flex items-center gap-2 p-2">
+          <img
+            src={'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'}
+            alt="Conversation"
+            className="h-8 w-8 rounded-full"
+          />
+          <div>
+            <Skeleton className="mb-2 h-3 w-24" />
+            <Skeleton className="h-3 w-44" />
+          </div>
+        </div>
+        <div className="flex w-full grow flex-col gap-2 overflow-hidden p-4">
+          {Array.from({ length: 40 }).map((_, index) => (
+            <Skeleton key={index} style={{ width: `${Math.random() * (90 - 40 + 1) + 40}%` }} className="h-6" />
+          ))}
+        </div>
       </div>
     );
   }
