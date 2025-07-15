@@ -5,7 +5,7 @@ import User, { IUser } from '#models/user.model.js';
 import RefreshToken from '#models/refreshToken.model.js';
 import { generateAccessToken } from '#utils/jwt.utils.js';
 import { CONFLICT, CREATED, FORBIDDEN, OK, UNAUTHORIZED } from '#constants/http-status-codes.js';
-import { ACCESS_TOKEN_TTL, REFRESH_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_TTL } from '#constants/auth.js';
+import { REFRESH_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_TTL } from '#constants/auth.js';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -32,7 +32,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
-    res.status(CREATED).json({ message: 'User created successfully.', accessToken, maxAgeAccessTokenMS: ACCESS_TOKEN_TTL });
+    res.status(CREATED).json({ message: 'User created successfully.', accessToken });
   } catch (error) {
     next(error);
   }
@@ -65,7 +65,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
     res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
-    res.status(OK).json({ message: 'Login successful.', accessToken, maxAgeAccessTokenMS: ACCESS_TOKEN_TTL });
+    res.status(OK).json({ message: 'Login successful.', accessToken });
   } catch (error) {
     next(error);
   }
@@ -114,8 +114,6 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
     res.status(OK).json({
       message: 'Tokens refreshed successfully.',
       accessToken: newAccessToken,
-      maxAgeAccessTokenMS: ACCESS_TOKEN_TTL,
-      maxAgeRefreshTokenMS: REFRESH_TOKEN_TTL,
     });
   } catch (error) {
     next(error);
