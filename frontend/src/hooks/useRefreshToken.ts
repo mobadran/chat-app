@@ -4,7 +4,7 @@ import { useAuth } from '@/context/auth-provider';
 let refreshPromise: Promise<string | null> | null = null;
 
 export default function useRefreshToken() {
-  const { setAccessToken } = useAuth();
+  const { updateAccessToken } = useAuth();
 
   const refresh = async (): Promise<string | null> => {
     // If a refresh is already in progress, return the same promise
@@ -19,7 +19,7 @@ export default function useRefreshToken() {
         });
 
         const newAccessToken = response.data.accessToken;
-        setAccessToken(newAccessToken);
+        updateAccessToken(newAccessToken);
         return newAccessToken;
       } catch (error) {
         console.error('❌ Refresh token failed:', error);

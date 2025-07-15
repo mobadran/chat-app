@@ -1,8 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
+import User from '#models/user.model.js';
 
-export const suii = async (req: Request, res: Response, next: NextFunction) => {
+export const getUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('suii');
+    if (req.params.id === 'me') {
+      const user = await User.findById(req.user!.id);
+      res.status(200).json(user);
+      return;
+    }
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+    res.status(200).json(user);
   } catch (error) {
     next(error);
   }

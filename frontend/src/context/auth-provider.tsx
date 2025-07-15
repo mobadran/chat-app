@@ -1,27 +1,44 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 
-type AuthContextType = {
-  accessToken: string | null;
-  setAccessToken: (token: string | null) => void;
+type UserData = {
+  id: string;
+  email: string;
+  username: string;
+  displayName: string | null;
+  // Add other user fields as needed
 };
 
-const AuthContext = createContext<AuthContextType | null>(null);
+type AuthContextType = {
+  accessToken: string | null;
+  updateAccessToken: (token: string | null) => void;
+  userData: UserData | null;
+  updateUserData: (data: UserData | null) => void;
+};
 
 type AuthProviderProps = {
   children: ReactNode;
 };
 
+const AuthContext = createContext<AuthContextType | null>(null);
+
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
 
   const updateAccessToken = useCallback((token: string | null) => {
     setAccessToken(token);
   }, []);
 
+  const updateUserData = useCallback((data: UserData | null) => {
+    setUserData(data);
+  }, []);
+
   const authContextValue = {
     accessToken,
-    setAccessToken: updateAccessToken,
+    updateAccessToken,
+    userData,
+    updateUserData,
   };
 
   return <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>;
