@@ -1,0 +1,1 @@
+- when a logged in user logs in again, he gets redirected to the dashboard with the old users data. he needs to refresh the page to get the new data.

@@ -1,6 +1,6 @@
 import Conversation, { IConversation } from '#models/conversation.model.js';
 import ConversationMember from '#models/conversationMember.model.js';
-import User from '#models/user.model.js';
+import User, { IUser } from '#models/user.model.js';
 import { NextFunction, Request, Response } from 'express';
 import { BAD_REQUEST, CREATED, OK } from '#constants/http-status-codes.js';
 import { Document } from 'mongoose';
@@ -9,6 +9,7 @@ export const createConversation = async (req: Request, res: Response, next: Next
   try {
     const { type, name, members } = req.body;
 
+    // Add the current user to the members list if they are not already included
     if (!members.includes(req.user!.username)) {
       members.push(req.user!.username);
     }
@@ -34,7 +35,9 @@ export const createConversation = async (req: Request, res: Response, next: Next
 
     const conversation = await Conversation.create({
       type,
-      name: name || null,
+      // If: type === 'direct', name = null
+      // else if: type === 'group', name = name || null
+      name: type === 'direct' ? null : name || null,
     });
 
     const conversationMembers = foundUsers.map((user) => ({
@@ -54,18 +57,31 @@ export const getConversations = async (req: Request, res: Response, next: NextFu
   try {
     const conversations = await ConversationMember.find({ userId: req.user!.id }).select('conversationId').populate('conversationId');
 
-    const filteredConversations = conversations.filter((c) => c.conversationId !== null);
-    res.status(OK).json(
-      filteredConversations.map((c) => {
+    const filteredConversations = await Promise.all(
+      conversations.map(async (c) => {
         const populatedConversation = c.conversationId as IConversation & Document;
+
+        let name = populatedConversation.name;
+        if (populatedConversation.name === null) {
+          const users = await ConversationMember.find({ conversationId: populatedConversation._id, userId: { $ne: req.user!.id } }).populate(
+            'userId',
+            'username displayName',
+          );
+
+          name = users.map((u) => (u.userId as IUser).displayName).join(', ');
+          console.log(name);
+          console.log(users);
+        }
 
         return {
           _id: populatedConversation._id,
           type: populatedConversation.type,
-          name: populatedConversation.name,
+          name,
         };
       }),
     );
+
+    res.status(OK).json(filteredConversations);
   } catch (error) {
     next(error);
   }

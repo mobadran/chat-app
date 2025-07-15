@@ -1,12 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import useAxiosPrivate from '@/hooks/useAxiosPrivate';
 import { DialogClose } from '@radix-ui/react-dialog';
 import CreateConversationUserList from './create-conversation-user-list';
@@ -21,6 +13,7 @@ export default function CreateConversationButton() {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [name, setName] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDirect, setIsDirect] = useState(true);
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -45,12 +38,20 @@ export default function CreateConversationButton() {
         <CirclePlus />
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create Conversation</DialogTitle>
-          <DialogDescription>Select the users you want to chat with.</DialogDescription>
+        <DialogHeader className="flex flex-row items-center justify-center gap-4">
+          <Button variant={isDirect ? 'default' : 'outline'} onClick={() => setIsDirect(true)}>
+            Direct
+          </Button>
+          <Button variant={isDirect ? 'outline' : 'default'} onClick={() => setIsDirect(false)}>
+            Group
+          </Button>
         </DialogHeader>
-        <Input placeholder="Conversation name" value={name} onChange={(e) => setName(e.target.value)} />
-        <CreateConversationUserList selectedItems={selectedItems} setSelectedItems={setSelectedItems} />
+        {!isDirect && <Input placeholder="Group name" value={name} onChange={(e) => setName(e.target.value)} />}
+        {isDirect ? (
+          <Input placeholder="Type to add user..." onChange={(e) => setSelectedItems([e.target.value])} />
+        ) : (
+          <CreateConversationUserList selectedItems={selectedItems} setSelectedItems={setSelectedItems} />
+        )}
         <DialogFooter>
           <DialogClose className="btn-outline h-10">Cancel</DialogClose>
           <Button className="text-md h-10" onClick={createConversation}>
