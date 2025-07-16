@@ -62,21 +62,23 @@ export const getConversations = async (req: Request, res: Response, next: NextFu
         const populatedConversation = c.conversationId as IConversation & Document;
 
         let name = populatedConversation.name;
-        if (populatedConversation.name === null) {
+        let avatar = null;
+        if (populatedConversation.name === null || populatedConversation.type === 'direct') {
           const users = await ConversationMember.find({ conversationId: populatedConversation._id, userId: { $ne: req.user!.id } }).populate(
             'userId',
-            'username displayName',
+            'username displayName avatar',
           );
 
           name = users.map((u) => (u.userId as IUser).displayName).join(', ');
-          console.log(name);
-          console.log(users);
+          avatar = (users[0].userId as IUser).avatar;
+          console.log(avatar);
         }
 
         return {
           _id: populatedConversation._id,
           type: populatedConversation.type,
           name,
+          avatar,
         };
       }),
     );

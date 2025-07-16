@@ -1,19 +1,42 @@
 import { NextFunction, Request, Response } from 'express';
 import User from '#models/user.model.js';
+import { uploadAvatar } from '#lib/supabase.js';
 
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (req.params.id === 'me') {
-      const user = await User.findById(req.user!.id).select('username displayName');
+      const user = await User.findById(req.user!.id).select('username displayName avatar');
       res.status(200).json(user);
       return;
     }
-    const user = await User.findById(req.params.id).select('username displayName');
+    const user = await User.findById(req.params.id).select('username displayName avatar');
     if (!user) {
       res.status(404).json({ message: 'User not found' });
       return;
     }
     res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateAvatar = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    if (id !== 'me') {
+      res.status(403).json({ message: "You are not authorized to update this user's avatar" });
+      return;
+    }
+    const file = req.file;
+    if (!file) {
+      res.status(400).json({ error: 'No image uploaded' });
+      return;
+    }
+
+    const avatarUrl = await uploadAvatar(file, req.user!.id);
+    await User.findByIdAndUpdate(req.user!.id, { avatar: avatarUrl });
+
+    res.status(200).json({ message: 'Avatar updated successfully', avatarUrl });
   } catch (error) {
     next(error);
   }

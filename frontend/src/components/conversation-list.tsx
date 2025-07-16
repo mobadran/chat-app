@@ -38,7 +38,7 @@ export default function ConversationList({
           >
             <img
               src={
-                conversation.image || 'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'
+                conversation.avatar || 'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'
               }
               alt={conversation.name}
               className="h-10 w-10 rounded-full"

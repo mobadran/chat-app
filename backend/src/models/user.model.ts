@@ -36,6 +36,7 @@ const UserSchema: Schema = new Schema<IUser>(
     },
     avatar: {
       type: String,
+      default: null,
     },
   },
   { timestamps: true },

@@ -6,6 +6,7 @@ type UserData = {
   email: string;
   username: string;
   displayName: string | null;
+  avatar: string | null;
   // Add other user fields as needed
 };
 

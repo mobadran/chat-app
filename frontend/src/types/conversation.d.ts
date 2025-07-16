@@ -2,7 +2,7 @@ type Conversation = {
   _id: string;
   type: string;
   name: string;
-  image: string;
+  avatar: string;
 };
 
 type ConversationMember = {
