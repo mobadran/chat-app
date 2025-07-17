@@ -1,9 +1,10 @@
 import Conversation, { IConversation } from '#models/conversation.model.js';
 import ConversationMember from '#models/conversationMember.model.js';
-import User, { IUser } from '#models/user.model.js';
+import User from '#models/user.model.js';
 import { NextFunction, Request, Response } from 'express';
 import { BAD_REQUEST, CREATED, OK } from '#constants/http-status-codes.js';
 import { Document } from 'mongoose';
+import { getConversationNameAndAvatar } from '#utils/conversation.utils.js';
 
 export const createConversation = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -61,18 +62,7 @@ export const getConversations = async (req: Request, res: Response, next: NextFu
       conversations.map(async (c) => {
         const populatedConversation = c.conversationId as IConversation & Document;
 
-        let name = populatedConversation.name;
-        let avatar = null;
-        if (populatedConversation.name === null || populatedConversation.type === 'direct') {
-          const users = await ConversationMember.find({ conversationId: populatedConversation._id, userId: { $ne: req.user!.id } }).populate(
-            'userId',
-            'username displayName avatar',
-          );
-
-          name = users.map((u) => (u.userId as IUser).displayName).join(', ');
-          avatar = (users[0].userId as IUser).avatar;
-          console.log(avatar);
-        }
+        const { name, avatar } = await getConversationNameAndAvatar(populatedConversation, req.user!.id);
 
         return {
           _id: populatedConversation._id,
@@ -93,7 +83,8 @@ export const getConversation = async (req: Request, res: Response, next: NextFun
   try {
     const conversation = await Conversation.findById(req.params.id);
     const conversationMembers = await ConversationMember.find({ conversationId: req.params.id }).populate('userId');
-    res.status(OK).json({ conversation, conversationMembers });
+    const { name, avatar } = await getConversationNameAndAvatar(conversation as IConversation, req.user!.id);
+    res.status(OK).json({ conversation: { ...conversation, name, avatar }, conversationMembers });
   } catch (error) {
     next(error);
   }

@@ -99,7 +99,7 @@ export default function Conversation({
       <div className="bg-sidebar flex items-center gap-2 p-2">
         <img
           src={
-            conversation?.data?.conversation?.image ||
+            conversation?.data?.conversation?.avatar ||
             'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'
           }
           alt={conversation?.data?.conversation?.name}
