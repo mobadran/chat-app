@@ -42,7 +42,8 @@ export async function uploadAvatar(file: MulterFile, userId: string, oldAvatarUr
   const { data } = supabase.storage.from('public-files').getPublicUrl(path);
 
   if (oldAvatarUrl) {
-    const { error } = await supabase.storage.from('public-files').remove([oldAvatarUrl]);
+    const path = oldAvatarUrl.split('public-files/').pop()!;
+    const { error } = await supabase.storage.from('public-files').remove([path]);
     if (error) {
       console.error('Error removing old avatar:', error);
     }
