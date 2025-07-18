@@ -33,7 +33,15 @@ export const updateAvatar = async (req: Request, res: Response, next: NextFuncti
       return;
     }
 
-    const avatarUrl = await uploadAvatar(file, req.user!.id);
+    const avatarUrl = await uploadAvatar(file, req.user!.id, req.user!.avatar).catch((error) => {
+      if (error.cause === 'invalid-image-type') {
+        res.status(400).json({ error: 'Invalid image type. Only JPEG, PNG, and WEBP are allowed.' });
+        return null;
+      }
+    });
+    if (!avatarUrl) {
+      return;
+    }
     await User.findByIdAndUpdate(req.user!.id, { avatar: avatarUrl });
 
     res.status(200).json({ message: 'Avatar updated successfully', avatarUrl });
