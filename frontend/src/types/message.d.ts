@@ -7,4 +7,5 @@ export type Message = {
     displayName: string;
     avatar: string;
   };
+  createdAt: string;
 };

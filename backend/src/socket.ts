@@ -51,6 +51,7 @@ export function setupSocketIO(io: Server) {
           displayName: user.displayName || user.username,
           avatar: user.avatar,
         },
+        createdAt: new Date().toISOString(),
       };
       // Send to all users except sender
       socket.to(msg.conversationId).emit('new-message', message);

@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { MessageSquare, Send } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Skeleton } from './ui/skeleton';
+import { formatMessageTimestamp } from '@/lib/utils';
 
 export default function Conversation({
   currentConversation,
@@ -118,19 +119,22 @@ export default function Conversation({
       {/* Messages */}
       <div className="flex grow flex-col gap-2 overflow-y-auto p-5 pb-8">
         {allMessages?.map((message: Message, index: number) => (
-          <div key={index} className="flex flex-col gap-2 border-b">
-            <div className="flex items-center gap-2">
-              <img
-                src={
-                  message.senderInfo.avatar ||
-                  'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'
-                }
-                alt={message.senderInfo.displayName}
-                className="h-8 w-8 rounded-full"
-              />
-              <h3 className="font-semibold text-nowrap">{message.senderInfo.displayName}</h3>
+          <div key={index} className="flex items-center gap-2 border-b">
+            <img
+              src={
+                message.senderInfo.avatar ||
+                'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'
+              }
+              alt={message.senderInfo.displayName}
+              className="h-10 w-10 rounded-full"
+            />
+            <div className="flex grow flex-col">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-nowrap">{message.senderInfo.displayName}</h3>
+                <p className="text-muted-foreground text-xs">{formatMessageTimestamp(message.createdAt)}</p>
+              </div>
+              <p>{message.content}</p>
             </div>
-            <p className="p-1">{message.content}</p>
           </div>
         ))}
       </div>
