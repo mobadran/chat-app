@@ -1,13 +1,17 @@
 import ConversationMember from '#models/conversationMember.model.js';
 import Message from '#models/message.model.js';
 
-export function createMessage(user: { username: string; userId: string; displayName: string }, msg: { conversationId: string; content: string }) {
+export function createMessage(
+  user: { username: string; userId: string; displayName: string; avatar: string },
+  msg: { conversationId: string; content: string },
+) {
   return Message.create({
     conversationId: msg.conversationId,
     senderId: user.userId,
     senderInfo: {
       username: user.username,
       displayName: user.displayName || user.username,
+      avatar: user.avatar,
     },
     content: msg.content,
   });

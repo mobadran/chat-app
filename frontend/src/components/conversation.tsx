@@ -118,9 +118,19 @@ export default function Conversation({
       {/* Messages */}
       <div className="flex grow flex-col gap-2 overflow-y-auto p-5 pb-8">
         {allMessages?.map((message: Message, index: number) => (
-          <div key={index} className="flex gap-2 border-b">
-            <h3 className="font-semibold text-nowrap">{message.senderInfo.displayName}</h3>
-            <p>{message.content}</p>
+          <div key={index} className="flex flex-col gap-2 border-b">
+            <div className="flex items-center gap-2">
+              <img
+                src={
+                  message.senderInfo.avatar ||
+                  'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'
+                }
+                alt={message.senderInfo.displayName}
+                className="h-8 w-8 rounded-full"
+              />
+              <h3 className="font-semibold text-nowrap">{message.senderInfo.displayName}</h3>
+            </div>
+            <p className="p-1">{message.content}</p>
           </div>
         ))}
       </div>

@@ -11,7 +11,7 @@ export function setupSocketIO(io: Server) {
 
     try {
       const payload = verifyAccessToken(token);
-      socket.data.user = { username: payload.username, userId: payload.userId, displayName: payload.displayName };
+      socket.data.user = { ...payload, id: payload.userId };
       next();
     } catch {
       next(new Error('Unauthorized'));
@@ -49,6 +49,7 @@ export function setupSocketIO(io: Server) {
           userId: user.userId,
           username: user.username,
           displayName: user.displayName || user.username,
+          avatar: user.avatar,
         },
       };
       // Send to all users except sender

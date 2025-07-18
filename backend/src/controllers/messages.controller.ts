@@ -11,7 +11,7 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
     const { conversationId } = req.params;
     const username = req.user!.username;
 
-    const memberRecord = await ConversationMember.findOne({ conversationId, userId: req.user!.id }).populate('userId', 'username displayName');
+    const memberRecord = await ConversationMember.findOne({ conversationId, userId: req.user!.id }).populate('userId', 'username displayName avatar');
     if (!memberRecord) {
       res.status(FORBIDDEN).json({ message: 'You are not authorized to send messages to this conversation, or the conversation/user does not exist.' });
       return;
@@ -25,6 +25,7 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
       senderInfo: {
         username,
         displayName: userId.displayName || username,
+        avatar: userId.avatar,
       },
       content,
     });
@@ -46,7 +47,7 @@ export const getMessages = async (req: Request, res: Response, next: NextFunctio
       return;
     }
 
-    const messages = await Message.find({ conversationId }).populate('senderId', 'username displayName');
+    const messages = await Message.find({ conversationId });
     res.status(OK).json(messages);
   } catch (error) {
     next(error);

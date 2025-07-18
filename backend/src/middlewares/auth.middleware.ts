@@ -16,7 +16,7 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
   try {
     const payload = verifyAccessToken(token);
     validator.TokenPayload.parse(payload);
-    req.user = { id: payload.userId, username: payload.username };
+    req.user = { ...payload, id: payload.userId };
     next();
   } catch (err) {
     if (err instanceof ZodError) {

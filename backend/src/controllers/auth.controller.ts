@@ -28,7 +28,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     const refreshToken = uuidv4();
     await RefreshToken.create({ userId: user._id, token: refreshToken });
 
-    const accessToken = generateAccessToken(user._id.toString(), user.username, user.displayName);
+    const accessToken = generateAccessToken(user._id.toString(), user.username, user.displayName, user.avatar);
 
     res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
@@ -56,7 +56,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
 
-    const accessToken = generateAccessToken(user._id.toString(), user.username, user.displayName);
+    const accessToken = generateAccessToken(user._id.toString(), user.username, user.displayName, user.avatar);
     const refreshToken = uuidv4();
 
     // Invalidate all old refresh tokens
@@ -99,7 +99,7 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
       return;
     }
 
-    const newAccessToken = generateAccessToken(existingRefreshToken.userId.toString(), user.username, user.displayName);
+    const newAccessToken = generateAccessToken(existingRefreshToken.userId.toString(), user.username, user.displayName, user.avatar);
     const newRefreshToken = uuidv4();
 
     existingRefreshToken.invalidatedAt = new Date();

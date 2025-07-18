@@ -5,5 +5,6 @@ export type Message = {
   senderInfo: {
     username: string;
     displayName: string;
+    avatar: string;
   };
 };
