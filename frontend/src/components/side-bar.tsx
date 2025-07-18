@@ -8,7 +8,7 @@ export default function SideBar() {
       <img
         src={userData?.avatar || 'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'}
         alt="Profile"
-        className="h-8 w-8 rounded-full"
+        className="h-8 w-8 rounded-full border"
       />
       <Settings strokeWidth={1} className="text-muted-foreground h-8 w-8" />
     </nav>

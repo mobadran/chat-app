@@ -104,7 +104,7 @@ export default function Conversation({
             'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'
           }
           alt={conversation?.data?.conversation?.name}
-          className="h-8 w-8 rounded-full"
+          className="h-8 w-8 rounded-full border"
         />
         <div>
           <p>{conversation?.data?.conversation?.name}</p>
@@ -126,7 +126,7 @@ export default function Conversation({
                 'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'
               }
               alt={message.senderInfo.displayName}
-              className="h-10 w-10 rounded-full"
+              className="h-10 w-10 rounded-full border"
             />
             <div className="flex grow flex-col">
               <div className="flex items-center justify-between">

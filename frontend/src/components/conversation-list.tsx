@@ -41,7 +41,7 @@ export default function ConversationList({
                 conversation.avatar || 'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'
               }
               alt={conversation.name}
-              className="h-10 w-10 rounded-full"
+              className="h-10 w-10 rounded-full border"
             />
             {conversation.name}
           </button>
