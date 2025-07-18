@@ -119,7 +119,7 @@ export default function Conversation({
       {/* Messages */}
       <div className="flex grow flex-col gap-2 overflow-y-auto p-5 pb-8">
         {allMessages?.map((message: Message, index: number) => (
-          <div key={index} className="flex items-center gap-2 border-b">
+          <div key={index} className="flex gap-2 border-b">
             <img
               src={
                 message.senderInfo.avatar ||
@@ -133,7 +133,7 @@ export default function Conversation({
                 <h3 className="font-semibold text-nowrap">{message.senderInfo.displayName}</h3>
                 <p className="text-muted-foreground text-xs">{formatMessageTimestamp(message.createdAt)}</p>
               </div>
-              <p>{message.content}</p>
+              <p className="mb-2 break-all">{message.content}</p>
             </div>
           </div>
         ))}
