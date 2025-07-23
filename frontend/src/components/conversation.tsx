@@ -2,8 +2,8 @@ import useAxiosPrivate from '@/hooks/useAxiosPrivate';
 import useSocket from '@/context/socket-provider';
 import type { Message } from '@/types/message';
 import { useQuery } from '@tanstack/react-query';
-import { MessageSquare, Send } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { ArrowBigDown, MessageSquare, Send } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Skeleton } from './ui/skeleton';
 import { formatMessageTimestamp } from '@/lib/utils';
 
@@ -19,10 +19,11 @@ export default function Conversation({
   const [message, setMessage] = useState('');
   const buttonRef = useRef<HTMLButtonElement>(null);
   const messageContainerRef = useRef<HTMLDivElement>(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
 
   const { newMessages, sendMessage } = useMessages(currentConversation!);
 
-  useScrollToBottom(messageContainerRef, newMessages);
+  const scrollToBottom = useScrollToBottom(messageContainerRef, newMessages);
 
   const conversation = useQuery({
     queryKey: ['conversations', currentConversation],
@@ -38,6 +39,26 @@ export default function Conversation({
   });
 
   useEffect(() => {
+    const container = messageContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const threshold = 50; // pixels from bottom to still consider "at bottom"
+      const isBottom = container.scrollHeight - container.scrollTop - container.clientHeight <= threshold;
+      setIsAtBottom(isBottom);
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (messages.isSuccess) {
+      scrollToBottom();
+    }
+  }, [messages.isSuccess, scrollToBottom]);
+
+  useEffect(() => {
     if (!socketConnected || !socket || !currentConversation) return;
     socket.emit('join-room', currentConversation, (success: boolean) => {
       if (!success) {
@@ -47,7 +68,6 @@ export default function Conversation({
     });
     // eslint-disable-next-line
   }, [currentConversation, socketConnected]);
-
 
   const allMessages = [...(messages.data || []), ...newMessages];
 
@@ -143,6 +163,14 @@ export default function Conversation({
         ))}
       </div>
       {/* Input */}
+      <button
+        className={`hover:bg-accent/50 bg-accent fixed right-6 bottom-24 flex cursor-pointer items-center gap-2 rounded-4xl p-2 transition-opacity ${
+          isAtBottom ? 'pointer-events-none opacity-0' : 'opacity-100'
+        }`}
+        onClick={() => scrollToBottom()}
+      >
+        <ArrowBigDown />
+      </button>
       <form
         onSubmit={handleSendMessage}
         style={{
@@ -160,14 +188,20 @@ export default function Conversation({
 }
 
 function useScrollToBottom(messagesContainerRef: React.RefObject<HTMLDivElement | null>, newMessages: Message[]) {
-  useEffect(() => {
+  const scrollToBottom = useCallback(() => {
     if (!messagesContainerRef?.current) return;
     messagesContainerRef.current.scrollTo({
       top: messagesContainerRef.current.scrollHeight,
       behavior: 'smooth',
     });
+  }, [messagesContainerRef]);
+
+  useEffect(() => {
+    scrollToBottom();
     // eslint-disable-next-line
   }, [newMessages]);
+
+  return scrollToBottom;
 }
 
 function useMessages(conversationId: string) {
