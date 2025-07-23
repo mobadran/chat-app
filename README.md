@@ -59,10 +59,12 @@ A modern, real-time chat application built with React, TypeScript, Node.js, Expr
 3. Create a `.env` file in the backend directory with the following variables:
 
    ```
-   PORT=3001
-   MONGODB_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
-   NODE_ENV=development
+   PORT=8000
+   FRONTEND_URL=http://localhost:5173
+   MONGO_URI=mongodb://localhost:27017/chat-app
+   ACCESS_TOKEN_SECRET=supersecret
+   SUPABASE_URL=https://<your-project>.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
    ```
 
 4. Start the development server:
@@ -87,7 +89,7 @@ A modern, real-time chat application built with React, TypeScript, Node.js, Expr
 3. Create a `.env` file in the frontend directory with the following variable:
 
    ```
-   VITE_API_URL=https://localhost:3001
+   VITE_API_URL=https://localhost:8000
    ```
 
 4. Start the development server:
@@ -96,7 +98,13 @@ A modern, real-time chat application built with React, TypeScript, Node.js, Expr
    npm run dev
    ```
 
-5. Open your browser and navigate to `https://localhost:5173`
+5. **Trust the Development Certificate**:
+   - First, visit the backend URL directly in your browser: `https://localhost:8000`
+   - You'll see a security warning (this is normal for self-signed certificates in development)
+   - Click "Advanced" and then "Proceed to localhost (unsafe)" or similar option to accept the certificate
+   - You should see a message indicating the backend is running
+
+6. Open your browser and navigate to the frontend at `https://localhost:5173`
 
 ## Project Structure
 
@@ -146,7 +154,11 @@ Run the following command in the project root to generate local development cert
 
 ```bash
 mkdir cert
-openssl req -nodes -new -x509 -keyout cert/localhost-key.pem -out cert/localhost.pem -days 365
+openssl req -x509 -out cert/localhost.pem -keyout cert/localhost-key.pem \
+  -newkey rsa:2048 -nodes -sha256 \
+  -subj "/CN=localhost" \
+  -addext "subjectAltName=DNS:localhost" \
+  -days 365
 ```
 
 > 📁 This will create a `cert/` folder containing:
