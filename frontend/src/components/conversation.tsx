@@ -18,8 +18,11 @@ export default function Conversation({
   const { socket, connected: socketConnected } = useSocket();
   const [message, setMessage] = useState('');
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const messageContainerRef = useRef<HTMLDivElement>(null);
 
   const { newMessages, sendMessage } = useMessages(currentConversation!);
+
+  useScrollToBottom(messageContainerRef, newMessages);
 
   const conversation = useQuery({
     queryKey: ['conversations', currentConversation],
@@ -44,6 +47,7 @@ export default function Conversation({
     });
     // eslint-disable-next-line
   }, [currentConversation, socketConnected]);
+
 
   const allMessages = [...(messages.data || []), ...newMessages];
 
@@ -117,7 +121,7 @@ export default function Conversation({
         </div>
       </div>
       {/* Messages */}
-      <div className="flex grow flex-col gap-2 overflow-y-auto p-5 pb-8">
+      <div ref={messageContainerRef} className="flex grow flex-col gap-2 overflow-y-auto p-5 pb-8">
         {allMessages?.map((message: Message, index: number) => (
           <div key={index} className="flex gap-2 border-b">
             <img
@@ -153,6 +157,17 @@ export default function Conversation({
       </form>
     </div>
   );
+}
+
+function useScrollToBottom(messagesContainerRef: React.RefObject<HTMLDivElement | null>, newMessages: Message[]) {
+  useEffect(() => {
+    if (!messagesContainerRef?.current) return;
+    messagesContainerRef.current.scrollTo({
+      top: messagesContainerRef.current.scrollHeight,
+      behavior: 'smooth',
+    });
+    // eslint-disable-next-line
+  }, [newMessages]);
 }
 
 function useMessages(conversationId: string) {
