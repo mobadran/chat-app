@@ -24,8 +24,8 @@ const MessageSchema: Schema = new Schema<IMessage>(
     },
     senderInfo: {
       username: { type: String, required: true },
-      displayName: { type: String, required: true },
-      avatar: { type: String, required: true },
+      displayName: { type: String },
+      avatar: { type: String },
     },
     content: {
       type: String,
