@@ -78,11 +78,7 @@ export default function Conversation({
     return (
       <div className="flex h-screen flex-col justify-center">
         <div className="bg-sidebar flex items-center gap-2 p-2">
-          <img
-            src={'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'}
-            alt="Conversation"
-            className="h-8 w-8 rounded-full"
-          />
+          <img src={NO_PFP} alt="Conversation" className="h-8 w-8 rounded-full" />
           <div>
             <Skeleton className="mb-2 h-3 w-24" />
             <Skeleton className="h-3 w-44" />
@@ -111,10 +107,7 @@ export default function Conversation({
       {/* Convo Metadata */}
       <div className="bg-sidebar flex items-center gap-2 p-2">
         <img
-          src={
-            conversation?.data?.conversation?.avatar ||
-            'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'
-          }
+          src={conversation?.data?.conversation?.avatar || NO_PFP}
           alt={conversation?.data?.conversation?.name}
           className="h-8 w-8 rounded-full border"
         />
@@ -133,10 +126,7 @@ export default function Conversation({
         {allMessages?.map((message: Message, index: number) => (
           <div key={index} className="flex gap-2 border-b">
             <img
-              src={
-                message.senderInfo.avatar ||
-                'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'
-              }
+              src={message.senderInfo.avatar || NO_PFP}
               alt={message.senderInfo.displayName}
               className="h-10 w-10 rounded-full border"
             />

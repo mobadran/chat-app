@@ -37,9 +37,7 @@ export default function ConversationList({
             className="flex w-full items-center gap-2 border-b p-2 text-start hover:cursor-pointer"
           >
             <img
-              src={
-                conversation.avatar || 'https://res.cloudinary.com/dqdmrudnh/image/upload/v1751855764/no-pfp_srllpf.jpg'
-              }
+              src={conversation.avatar || NO_PFP}
               alt={conversation.name}
               className="h-10 w-10 rounded-full border"
             />
