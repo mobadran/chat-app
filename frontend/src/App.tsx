@@ -17,6 +17,8 @@ function App() {
     queryFn: () => axiosPrivate.get('/api/v1/users/me').then((response) => response.data),
   });
 
+  useEscCloseConvo(setCurrentConversation);
+
   useEffect(() => {
     if (isSuccess && userData) {
       updateUserData(userData);
@@ -45,6 +47,20 @@ function App() {
       </ResizablePanelGroup>
     </div>
   );
+}
+
+function useEscCloseConvo(setCurrentConversation: React.Dispatch<React.SetStateAction<string | null>>) {
+  useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setCurrentConversation(null);
+      }
+    };
+    document.addEventListener('keydown', handleKeydown);
+    return () => {
+      document.removeEventListener('keydown', handleKeydown);
+    };
+  }, [setCurrentConversation]);
 }
 
 export default App;
