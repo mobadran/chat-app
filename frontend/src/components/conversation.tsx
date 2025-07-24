@@ -18,12 +18,12 @@ export default function Conversation({
   const { socket, connected: socketConnected } = useSocket();
   const [message, setMessage] = useState('');
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const messageContainerRef = useRef<HTMLDivElement>(null);
+  const [messageContainerEl, setMessageContainerEl] = useState<HTMLDivElement | null>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
 
   const { newMessages, sendMessage } = useMessages(currentConversation!);
 
-  const scrollToBottom = useScrollToBottom(messageContainerRef, newMessages);
+  const scrollToBottom = useScrollToBottom(messageContainerEl, newMessages, isAtBottom, setIsAtBottom);
 
   const conversation = useQuery({
     queryKey: ['conversations', currentConversation],
@@ -38,26 +38,14 @@ export default function Conversation({
     enabled: !!currentConversation,
   });
 
-  useEffect(() => {
-    const container = messageContainerRef.current;
-    if (!container) return;
-
-    const handleScroll = () => {
-      const threshold = 50; // pixels from bottom to still consider "at bottom"
-      const isBottom = container.scrollHeight - container.scrollTop - container.clientHeight <= threshold;
-      setIsAtBottom(isBottom);
-    };
-
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
-
+  // Scroll to bottom when messages are loaded
   useEffect(() => {
     if (messages.isSuccess) {
       scrollToBottom();
     }
   }, [messages.isSuccess, scrollToBottom]);
 
+  // Join room on mount
   useEffect(() => {
     if (!socketConnected || !socket || !currentConversation) return;
     socket.emit('join-room', currentConversation, (success: boolean) => {
@@ -141,7 +129,7 @@ export default function Conversation({
         </div>
       </div>
       {/* Messages */}
-      <div ref={messageContainerRef} className="flex grow flex-col gap-2 overflow-y-auto p-5 pb-8">
+      <div ref={setMessageContainerEl} className="flex grow flex-col gap-2 overflow-y-auto p-5 pb-8">
         {allMessages?.map((message: Message, index: number) => (
           <div key={index} className="flex gap-2 border-b">
             <img
@@ -187,19 +175,39 @@ export default function Conversation({
   );
 }
 
-function useScrollToBottom(messagesContainerRef: React.RefObject<HTMLDivElement | null>, newMessages: Message[]) {
+function useScrollToBottom(
+  messagesContainerRef: HTMLDivElement | null,
+  newMessages: Message[],
+  isAtBottom: boolean,
+  setIsAtBottom: (isAtBottom: boolean) => void,
+) {
   const scrollToBottom = useCallback(() => {
-    if (!messagesContainerRef?.current) return;
-    messagesContainerRef.current.scrollTo({
-      top: messagesContainerRef.current.scrollHeight,
+    if (!messagesContainerRef) return;
+    messagesContainerRef.scrollTo({
+      top: messagesContainerRef.scrollHeight,
       behavior: 'smooth',
     });
   }, [messagesContainerRef]);
 
   useEffect(() => {
+    if (!messagesContainerRef) return;
+
+    const handleScroll = () => {
+      const threshold = 50; // pixels from bottom to still consider "at bottom"
+      const isBottom =
+        messagesContainerRef.scrollHeight - messagesContainerRef.scrollTop - messagesContainerRef.clientHeight <=
+        threshold;
+      setIsAtBottom(isBottom);
+    };
+
+    messagesContainerRef.addEventListener('scroll', handleScroll);
+    return () => messagesContainerRef.removeEventListener('scroll', handleScroll);
+  }, [messagesContainerRef, setIsAtBottom]);
+
+  useEffect(() => {
+    if (!isAtBottom) return;
     scrollToBottom();
-    // eslint-disable-next-line
-  }, [newMessages]);
+  }, [newMessages, scrollToBottom, isAtBottom]);
 
   return scrollToBottom;
 }
