@@ -4,7 +4,7 @@ import type { Message } from '@/types/message';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowBigDown, MessageSquare, Send } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Skeleton } from './ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 import { formatMessageTimestamp } from '@/lib/utils';
 
 export default function Conversation({

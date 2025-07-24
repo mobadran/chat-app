@@ -1,6 +1,6 @@
 import useAxiosPrivate from '@/hooks/useAxiosPrivate';
 import { useQuery } from '@tanstack/react-query';
-import { Skeleton } from './ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ConversationList({
   setCurrentConversation,

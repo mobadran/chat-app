@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema, Model, PopulatedDoc } from 'mongoose';
-import { IConversation } from './conversation.model.js';
-import { IUser } from './user.model.js';
+import { IConversation } from '#models/conversation.model.js';
+import { IUser } from '#models/user.model.js';
 
 export interface IConversationMember extends Document {
   _id: mongoose.Types.ObjectId;

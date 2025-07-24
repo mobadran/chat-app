@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import Header from '@/components/header';
 import SideBar from '@/components/side-bar';
 import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from '@/components/ui/resizable';
-import { axiosPrivate } from './api/axios';
-import { useAuth } from './context/auth-provider';
+import { axiosPrivate } from '@/api/axios';
+import { useAuth } from '@/context/auth-provider';
 import { useQuery } from '@tanstack/react-query';
 
 function App() {

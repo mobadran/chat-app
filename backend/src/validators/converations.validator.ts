@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ObjectId } from './custom.validator.js';
+import { ObjectId } from '#validators/custom.validator.js';
 
 const CreateConversation = z.object({
   body: z.object({

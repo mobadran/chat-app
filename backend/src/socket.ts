@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import { verifyAccessToken } from './utils/jwt.utils.js';
+import { verifyAccessToken } from '#utils/jwt.utils.js';
 import { createMessage, userInConversation } from '#utils/socket.utils.js';
 
 export function setupSocketIO(io: Server) {

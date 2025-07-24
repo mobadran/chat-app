@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import useAxiosPrivate from '@/hooks/useAxiosPrivate';
 import { DialogClose } from '@radix-ui/react-dialog';
-import CreateConversationUserList from './create-conversation-user-list';
+import CreateConversationUserList from '@/components/create-conversation-user-list';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
