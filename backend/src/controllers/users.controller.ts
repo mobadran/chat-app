@@ -49,3 +49,13 @@ export const updateAvatar = async (req: Request, res: Response, next: NextFuncti
     next(error);
   }
 };
+
+export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { displayName } = req.body;
+    await User.findByIdAndUpdate(req.user!.id, { displayName });
+    res.status(200).json({ message: 'User updated successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
