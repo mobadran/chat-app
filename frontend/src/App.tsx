@@ -29,7 +29,11 @@ function App() {
         </ResizablePanel>
         <ResizableHandle />
         <ResizablePanel>
-          <Conversation currentConversation={currentConversation} conversationSize={conversationListSize} />
+          <Conversation
+            currentConversation={currentConversation}
+            conversationSize={conversationListSize}
+            key={currentConversation}
+          />
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

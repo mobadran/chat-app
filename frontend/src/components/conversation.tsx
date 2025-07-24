@@ -228,11 +228,6 @@ function useMessages(conversationId: string) {
     };
   }, [socket, conversationId]);
 
-  // Reset new messages when conversation changes
-  useEffect(() => {
-    setNewMessages([]);
-  }, [conversationId]);
-
   const sendMessage = (content: string) => {
     if (socket && conversationId && content.trim()) {
       socket.emit(
