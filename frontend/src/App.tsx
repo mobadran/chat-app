@@ -6,16 +6,23 @@ import SideBar from '@/components/side-bar';
 import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from '@/components/ui/resizable';
 import { axiosPrivate } from './api/axios';
 import { useAuth } from './context/auth-provider';
+import { useQuery } from '@tanstack/react-query';
 
 function App() {
   const [currentConversation, setCurrentConversation] = useState<string | null>(null);
   const [conversationListSize, setConversationListSize] = useState(20);
   const { updateUserData } = useAuth();
+  const { data: userData, isSuccess } = useQuery({
+    queryKey: ['user', 'me'],
+    queryFn: () => axiosPrivate.get('/api/v1/users/me').then((response) => response.data),
+  });
 
   useEffect(() => {
-    axiosPrivate.get('/api/v1/users/me').then((response) => updateUserData(response.data));
+    if (isSuccess && userData) {
+      updateUserData(userData);
+    }
     // eslint-disable-next-line
-  }, []);
+  }, [isSuccess, userData]);
 
   return (
     <div className="flex h-screen">

@@ -1,14 +1,6 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 
-type UserData = {
-  id: string;
-  email: string;
-  username: string;
-  displayName: string | null;
-  avatar: string | null;
-};
-
 type AuthContextType = {
   accessToken: string | null;
   updateAccessToken: (token: string | null) => void;
