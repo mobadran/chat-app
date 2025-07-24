@@ -20,7 +20,9 @@ export default function SideBar() {
 
 function UpdateData({ userData }: { userData: UserData | null }) {
   const axiosPrivate = useAxiosPrivate();
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [displayName, setDisplayName] = useState(userData?.displayName || '');
+
   function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -48,13 +50,14 @@ function UpdateData({ userData }: { userData: UserData | null }) {
         queryClient.invalidateQueries({
           queryKey: ['user', 'me'],
         });
+        setDialogOpen(false);
       })
       .catch((error) => {
         console.error(error);
       });
   }
   return (
-    <Dialog>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger className="cursor-pointer">
         <img src={userData?.avatar || NO_PFP} alt="Profile" className="h-8 w-8 rounded-full border" />
       </DialogTrigger>
@@ -76,7 +79,7 @@ function UpdateData({ userData }: { userData: UserData | null }) {
               setDisplayName(e.target.value);
             }}
           />
-          <Button>Update</Button>
+          <Button type="submit">Update</Button>
         </form>
       </DialogContent>
     </Dialog>
