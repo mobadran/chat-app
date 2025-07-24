@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/context/theme-provider.tsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from '@/components/login-page.tsx';
 import Register from '@/components/register-page.tsx';
+import Conversation from '@/components/conversation.tsx';
 import { AuthProvider } from '@/context/auth-provider.tsx';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/api/query-client.ts';
@@ -19,7 +20,9 @@ createRoot(document.getElementById('root')!).render(
           <QueryClientProvider client={queryClient}>
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<App />} />
+                <Route path="/" element={<App />}>
+                  <Route path="conversations/:conversationId" element={<Conversation />} />
+                </Route>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
               </Routes>

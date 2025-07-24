@@ -4,16 +4,13 @@ import type { Message } from '@/types/message';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowBigDown, MessageSquare, Send } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useParams, useOutletContext } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatMessageTimestamp } from '@/lib/utils';
 
-export default function Conversation({
-  currentConversation,
-  conversationSize,
-}: {
-  currentConversation: string | null;
-  conversationSize: number;
-}) {
+export default function Conversation() {
+  const { conversationId: currentConversation } = useParams<{ conversationId: string }>();
+  const { conversationListSize: conversationSize } = useOutletContext<{ conversationListSize: number }>();
   const axiosPrivate = useAxiosPrivate();
   const { socket, connected: socketConnected } = useSocket();
   const [message, setMessage] = useState('');

@@ -1,12 +1,9 @@
 import useAxiosPrivate from '@/hooks/useAxiosPrivate';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Link } from 'react-router-dom';
 
-export default function ConversationList({
-  setCurrentConversation,
-}: {
-  setCurrentConversation: (conversationId: string) => void;
-}) {
+export default function ConversationList() {
   const axiosPrivate = useAxiosPrivate();
 
   const { data, isLoading, isError, error } = useQuery({
@@ -32,9 +29,9 @@ export default function ConversationList({
     <ul className="flex flex-col gap-2">
       {data?.map((conversation: Conversation) => (
         <li key={conversation._id}>
-          <button
-            onClick={() => setCurrentConversation(conversation._id)}
-            className="flex w-full items-center gap-2 border-b p-2 text-start hover:cursor-pointer"
+          <Link
+            to={`/conversations/${conversation._id}`}
+            className="flex w-full items-center gap-2 border-b p-2 text-start hover:bg-accent"
           >
             <img
               src={conversation.avatar || NO_PFP}
@@ -42,7 +39,7 @@ export default function ConversationList({
               className="h-10 w-10 rounded-full border"
             />
             {conversation.name}
-          </button>
+          </Link>
         </li>
       )) || <p>No conversations found</p>}
     </ul>

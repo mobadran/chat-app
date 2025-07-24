@@ -1,5 +1,5 @@
 import ConversationList from '@/components/conversation-list';
-import Conversation from '@/components/conversation';
+
 import { useEffect, useState } from 'react';
 import Header from '@/components/header';
 import SideBar from '@/components/side-bar';
@@ -7,17 +7,18 @@ import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from '@/componen
 import { axiosPrivate } from '@/api/axios';
 import { useAuth } from '@/context/auth-provider';
 import { useQuery } from '@tanstack/react-query';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 function App() {
-  const [currentConversation, setCurrentConversation] = useState<string | null>(null);
-  const [conversationListSize, setConversationListSize] = useState(20);
+  const location = useLocation();
+  const [conversationListSize, setConversationListSize] = useState(30);
   const { updateUserData } = useAuth();
   const { data: userData, isSuccess } = useQuery({
     queryKey: ['user', 'me'],
     queryFn: () => axiosPrivate.get('/api/v1/users/me').then((response) => response.data),
   });
 
-  useEscCloseConvo(setCurrentConversation);
+  useEscCloseConvo();
 
   useEffect(() => {
     if (isSuccess && userData) {
@@ -33,34 +34,33 @@ function App() {
         <ResizablePanel minSize={0} maxSize={33} defaultSize={20} onResize={(size) => setConversationListSize(size)}>
           <div className="flex flex-col">
             <Header />
-            <ConversationList setCurrentConversation={setCurrentConversation} />
+            <ConversationList />
           </div>
         </ResizablePanel>
         <ResizableHandle />
         <ResizablePanel>
-          <Conversation
-            currentConversation={currentConversation}
-            conversationSize={conversationListSize}
-            key={currentConversation}
-          />
+          <div key={location.pathname} className="h-full">
+            <Outlet context={{ conversationListSize }} />
+          </div>
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
   );
 }
 
-function useEscCloseConvo(setCurrentConversation: React.Dispatch<React.SetStateAction<string | null>>) {
+function useEscCloseConvo() {
+  const navigate = useNavigate();
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setCurrentConversation(null);
+        navigate('/');
       }
     };
     document.addEventListener('keydown', handleKeydown);
     return () => {
       document.removeEventListener('keydown', handleKeydown);
     };
-  }, [setCurrentConversation]);
+  }, [navigate]);
 }
 
 export default App;
