@@ -38,7 +38,7 @@ export default function Conversation() {
   // Scroll to bottom when messages are loaded
   useEffect(() => {
     if (messages.isSuccess) {
-      scrollToBottom();
+      scrollToBottom('auto');
     }
   }, [messages.isSuccess, scrollToBottom]);
 
@@ -119,7 +119,7 @@ export default function Conversation() {
         </div>
       </div>
       {/* Messages */}
-      <div ref={setMessageContainerEl} className="flex grow flex-col gap-2 overflow-y-auto p-5 pb-8">
+      <div ref={setMessageContainerEl} className="flex grow flex-col gap-2 overflow-y-auto p-5 pr-8 pb-8">
         {allMessages?.map((message: Message, index: number) => (
           <div key={index} className="flex gap-2 border-b">
             <img
@@ -168,13 +168,16 @@ function useScrollToBottom(
   isAtBottom: boolean,
   setIsAtBottom: (isAtBottom: boolean) => void,
 ) {
-  const scrollToBottom = useCallback(() => {
-    if (!messagesContainerRef) return;
-    messagesContainerRef.scrollTo({
-      top: messagesContainerRef.scrollHeight,
-      behavior: 'smooth',
-    });
-  }, [messagesContainerRef]);
+  const scrollToBottom = useCallback(
+    (behavior: ScrollBehavior = 'smooth') => {
+      if (!messagesContainerRef) return;
+      messagesContainerRef.scrollTo({
+        top: messagesContainerRef.scrollHeight,
+        behavior,
+      });
+    },
+    [messagesContainerRef],
+  );
 
   useEffect(() => {
     if (!messagesContainerRef) return;
@@ -193,7 +196,7 @@ function useScrollToBottom(
 
   useEffect(() => {
     if (!isAtBottom) return;
-    scrollToBottom();
+    scrollToBottom('smooth');
   }, [newMessages, scrollToBottom, isAtBottom]);
 
   return scrollToBottom;

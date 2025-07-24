@@ -1,10 +1,11 @@
 import useAxiosPrivate from '@/hooks/useAxiosPrivate';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function ConversationList() {
   const axiosPrivate = useAxiosPrivate();
+  const location = useLocation();
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['conversations'],
@@ -26,12 +27,14 @@ export default function ConversationList() {
   }
 
   return (
-    <ul className="flex flex-col gap-2">
+    <ul className="flex flex-col">
       {data?.map((conversation: Conversation) => (
         <li key={conversation._id}>
           <Link
             to={`/conversations/${conversation._id}`}
-            className="flex w-full items-center gap-2 border-b p-2 text-start hover:bg-accent"
+            className={`hover:bg-accent flex w-full items-center gap-2 border-b p-2 text-start ${
+              location.pathname === `/conversations/${conversation._id}` ? 'bg-accent' : ''
+            }`}
           >
             <img
               src={conversation.avatar || NO_PFP}
