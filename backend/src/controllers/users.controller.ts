@@ -22,11 +22,6 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
 
 export const updateAvatar = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.params;
-    if (id !== 'me') {
-      res.status(403).json({ message: "You are not authorized to update this user's avatar" });
-      return;
-    }
     const file = req.file;
     if (!file) {
       res.status(400).json({ error: 'No image uploaded' });
