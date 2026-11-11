@@ -6,6 +6,7 @@ backend/cert/
 
 # Builds
 backend/dist/
+frontend/dist/
 build/
 frontend/out/
 
