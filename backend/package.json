@@ -4,7 +4,7 @@
   "description": "The Backend of Chat App",
   "main": "server.ts",
   "scripts": {
-    "dev": "tsx --watch src/server.ts",
+    "dev": "node --conditions=development --import tsx --watch src/server.ts",
     "start": "node dist/server.js",
     "build": "tsc"
   },
@@ -12,7 +12,10 @@
   "license": "ISC",
   "type": "module",
   "imports": {
-    "#*": "./src/*"
+    "#*": {
+      "development": "./src/*",
+      "default": "./dist/*"
+    }
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.51.0",
