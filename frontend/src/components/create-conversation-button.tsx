@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CirclePlus } from 'lucide-react';
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/notifications';
 
 export default function CreateConversationButton() {
   const axiosPrivate = useAxiosPrivate();
@@ -26,10 +28,17 @@ export default function CreateConversationButton() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
       setIsDialogOpen(false);
+      setSelectedItems([]);
+      setName('');
+      toast.success('Conversation created');
     },
+    onError: (error) => toast.error('Could not create conversation', { description: getErrorMessage(error) }),
   });
   const createConversation = () => {
-    if (selectedItems.length === 0) return;
+    if (selectedItems.length === 0) {
+      toast.error('Select at least one person');
+      return;
+    }
     mutation.mutate({ members: selectedItems, name });
   };
   return (

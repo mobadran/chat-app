@@ -1,15 +1,14 @@
 import axios from '@/api/axios';
-import ErrorDialog from '@/components/error-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRef, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/notifications';
 
 export default function Login() {
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const formRef = useRef<HTMLFormElement>(null);
-  const [open, setOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
@@ -34,22 +33,15 @@ export default function Login() {
       );
 
       if (response.status === 200) {
+        toast.success('Signed in successfully');
         navigate(from, { replace: true });
         return;
       }
-
-      showErrorMessage(response.data.message);
-      // eslint-disable-next-line
-    } catch (err: any) {
-      showErrorMessage(err.response.data.message);
+    } catch (error) {
+      toast.error('Sign in failed', { description: getErrorMessage(error, 'Check your credentials and try again.') });
     } finally {
       setButtonDisabled(false);
     }
-  }
-
-  function showErrorMessage(message: string) {
-    setOpen(true);
-    setErrorMessage(message);
   }
 
   return (
@@ -94,7 +86,6 @@ export default function Login() {
           </Link>
         </span>
       </form>
-      <ErrorDialog message={errorMessage} open={open} onOpenChange={setOpen} />
     </main>
   );
 }

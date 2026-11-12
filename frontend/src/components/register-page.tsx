@@ -1,15 +1,14 @@
-import ErrorDialog from '@/components/error-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRef, useState } from 'react';
 import axios from '@/api/axios';
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/notifications';
 
 export default function Register() {
   const [disabled, setDisabled] = useState(true);
   const formRef = useRef<HTMLFormElement>(null);
-  const [open, setOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
   async function sendFormData(e: React.FormEvent<HTMLFormElement>) {
@@ -36,22 +35,15 @@ export default function Register() {
       );
 
       if (response.status === 201) {
+        toast.success('Account created successfully');
         navigate('/');
         return;
       }
-
-      showErrorMessage(response.data.message);
-      // eslint-disable-next-line
-    } catch (err: any) {
-      showErrorMessage(err.response.data.message);
+    } catch (error) {
+      toast.error('Registration failed', { description: getErrorMessage(error) });
     } finally {
       setDisabled(false);
     }
-  }
-
-  function showErrorMessage(message: string) {
-    setOpen(true);
-    setErrorMessage(message);
   }
 
   return (
@@ -114,7 +106,6 @@ export default function Register() {
           </Link>
         </span>
       </form>
-      <ErrorDialog message={errorMessage} open={open} onOpenChange={setOpen} />
     </main>
   );
 }

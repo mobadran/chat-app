@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatMessageTimestamp } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export default function Conversation() {
   const { conversationId: currentConversation } = useParams<{ conversationId: string }>();
@@ -48,6 +49,7 @@ export default function Conversation() {
     socket.emit('join-room', currentConversation, (success: boolean) => {
       if (!success) {
         console.error('Failed to join room');
+        toast.error('Could not join this conversation. Refresh and try again.');
         return;
       }
     });
@@ -58,8 +60,7 @@ export default function Conversation() {
 
   function handleSendMessage(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    sendMessage(message);
-    setMessage('');
+    if (sendMessage(message)) setMessage('');
   }
 
   if (!currentConversation) {
@@ -233,36 +234,41 @@ function useMessages(conversationId: string) {
   }, [socket, conversationId, upsertMessage]);
 
   const sendMessage = (content: string) => {
-    if (socket && conversationId && content.trim()) {
-      const clientMessageId = crypto.randomUUID();
-      const optimisticMessage: Message = {
-        _id: `client:${clientMessageId}`,
-        clientMessageId,
-        status: 'sending',
+    if (!content.trim()) return false;
+    if (!socket || !socket.connected || !conversationId) {
+      toast.error('Message could not be sent', { description: 'You are currently disconnected. Try again when you reconnect.' });
+      return false;
+    }
+    const clientMessageId = crypto.randomUUID();
+    const optimisticMessage: Message = {
+      _id: `client:${clientMessageId}`,
+      clientMessageId,
+      status: 'sending',
+      conversationId,
+      content: content.trim(),
+      senderInfo: { username: '', displayName: 'You', avatar: '' },
+      createdAt: new Date().toISOString(),
+    };
+    upsertMessage(optimisticMessage);
+    socket.emit(
+      'send-message',
+      {
         conversationId,
         content: content.trim(),
-        senderInfo: { username: '', displayName: 'You', avatar: '' },
-        createdAt: new Date().toISOString(),
-      };
-      upsertMessage(optimisticMessage);
-      socket.emit(
-        'send-message',
-        {
-          conversationId,
-          content: content.trim(),
-          clientMessageId,
-        },
-        (success: boolean, message: Message) => {
-          if (!success) {
-            console.error('Failed to send message');
-            setNewMessages((prev) => prev.map((item) => item.clientMessageId === clientMessageId ? { ...item, status: 'failed' } : item));
-            return;
-          } else {
-            upsertMessage(message);
-          }
-        },
-      );
-    }
+        clientMessageId,
+      },
+      (success: boolean, message: Message) => {
+        if (!success) {
+          console.error('Failed to send message');
+          toast.error('Message could not be sent', { description: 'Check your connection and try again.' });
+          setNewMessages((prev) => prev.map((item) => item.clientMessageId === clientMessageId ? { ...item, status: 'failed' } : item));
+          return;
+        } else {
+          upsertMessage(message);
+        }
+      },
+    );
+    return true;
   };
 
   return { newMessages, sendMessage };

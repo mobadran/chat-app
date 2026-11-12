@@ -7,6 +7,8 @@ import { queryClient } from '@/api/query-client';
 import { Input } from '@/components/ui/input';
 import { Button } from './ui/button';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/notifications';
 
 export default function SideBar() {
   const { userData } = useAuth();
@@ -31,14 +33,14 @@ function UpdateData({ userData }: { userData: UserData | null }) {
     axiosPrivate
       .post('/api/v1/users/avatar', formData)
       .then(() => {
-        console.log('Successful');
         // Revalidate query
         queryClient.invalidateQueries({
           queryKey: ['user', 'me'],
         });
+        toast.success('Profile picture updated');
       })
       .catch((error) => {
-        console.error(error);
+        toast.error('Could not update profile picture', { description: getErrorMessage(error) });
       });
   }
 
@@ -51,9 +53,10 @@ function UpdateData({ userData }: { userData: UserData | null }) {
           queryKey: ['user', 'me'],
         });
         setDialogOpen(false);
+        toast.success('Display name updated');
       })
       .catch((error) => {
-        console.error(error);
+        toast.error('Could not update display name', { description: getErrorMessage(error) });
       });
   }
   return (

@@ -11,6 +11,7 @@ import { AuthProvider } from '@/context/auth-provider.tsx';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/api/query-client.ts';
 import { SocketProvider } from '@/context/socket-provider.tsx';
+import { Toaster } from 'sonner';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')!).render(
       <AuthProvider>
         <SocketProvider>
           <QueryClientProvider client={queryClient}>
+            <Toaster position="top-right" richColors theme="system" />
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<App />}>
