@@ -54,7 +54,7 @@ export default function Conversation() {
     // eslint-disable-next-line
   }, [currentConversation, socketConnected]);
 
-  const allMessages = [...(messages.data || []), ...newMessages];
+  const allMessages = deduplicateAndOrder([...(messages.data || []), ...newMessages]);
 
   function handleSendMessage(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -133,6 +133,8 @@ export default function Conversation() {
                 <p className="text-muted-foreground text-xs">{formatMessageTimestamp(message.createdAt)}</p>
               </div>
               <p className="mb-2 break-all">{message.content}</p>
+              {message.status === 'sending' && <p className="text-muted-foreground text-xs">Sending…</p>}
+              {message.status === 'failed' && <p className="text-destructive text-xs">Failed to send</p>}
             </div>
           </div>
         ))}
@@ -206,32 +208,57 @@ function useMessages(conversationId: string) {
   const { socket } = useSocket();
   const [newMessages, setNewMessages] = useState<Message[]>([]);
 
+  const upsertMessage = useCallback((message: Message) => {
+    setNewMessages((prev) => {
+      const matchingIndex = prev.findIndex(
+        (item) => item._id === message._id || (!!message.clientMessageId && item.clientMessageId === message.clientMessageId),
+      );
+      if (matchingIndex < 0) return [...prev, message];
+      const next = [...prev];
+      next[matchingIndex] = { ...next[matchingIndex], ...message, status: 'sent' };
+      return next;
+    });
+  }, []);
+
   useEffect(() => {
     function handleNewMessage(message: Message) {
       if (message.conversationId !== conversationId) return;
-      setNewMessages((prev) => [...prev, message]);
+      upsertMessage(message);
     }
     if (!socket) return;
     socket.on('new-message', handleNewMessage);
     return () => {
       socket.off('new-message', handleNewMessage);
     };
-  }, [socket, conversationId]);
+  }, [socket, conversationId, upsertMessage]);
 
   const sendMessage = (content: string) => {
     if (socket && conversationId && content.trim()) {
+      const clientMessageId = crypto.randomUUID();
+      const optimisticMessage: Message = {
+        _id: `client:${clientMessageId}`,
+        clientMessageId,
+        status: 'sending',
+        conversationId,
+        content: content.trim(),
+        senderInfo: { username: '', displayName: 'You', avatar: '' },
+        createdAt: new Date().toISOString(),
+      };
+      upsertMessage(optimisticMessage);
       socket.emit(
         'send-message',
         {
           conversationId,
-          content,
+          content: content.trim(),
+          clientMessageId,
         },
         (success: boolean, message: Message) => {
           if (!success) {
             console.error('Failed to send message');
+            setNewMessages((prev) => prev.map((item) => item.clientMessageId === clientMessageId ? { ...item, status: 'failed' } : item));
             return;
           } else {
-            setNewMessages((prev) => [...prev, message]);
+            upsertMessage(message);
           }
         },
       );
@@ -274,5 +301,19 @@ function MessageInput({
         }
       }}
     ></textarea>
+  );
+}
+
+function deduplicateAndOrder(messages: Message[]): Message[] {
+  const uniqueMessages = new Map<string, Message>();
+
+  for (const message of messages) {
+    const key = message.clientMessageId ? `client:${message.clientMessageId}` : message._id;
+    const existing = uniqueMessages.get(key);
+    uniqueMessages.set(key, existing ? { ...existing, ...message, status: 'sent' } : message);
+  }
+
+  return [...uniqueMessages.values()].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
   );
 }

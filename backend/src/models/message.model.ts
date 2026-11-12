@@ -8,6 +8,7 @@ export interface IMessage extends Document {
     displayName: string;
   };
   content: string;
+  clientMessageId?: string;
 }
 
 const MessageSchema: Schema = new Schema<IMessage>(
@@ -32,6 +33,7 @@ const MessageSchema: Schema = new Schema<IMessage>(
       required: true,
       trim: true,
     },
+    clientMessageId: { type: String },
   },
   {
     timestamps: true,
@@ -39,6 +41,10 @@ const MessageSchema: Schema = new Schema<IMessage>(
 );
 
 MessageSchema.index({ conversationId: 1 });
+MessageSchema.index(
+  { conversationId: 1, senderId: 1, clientMessageId: 1 },
+  { unique: true, partialFilterExpression: { clientMessageId: { $type: 'string' } } },
+);
 
 const Message: Model<IMessage> = mongoose.model<IMessage>('Message', MessageSchema);
 

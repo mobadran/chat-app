@@ -35,32 +35,26 @@ export function setupSocketIO(io: Server) {
       cb(true);
     });
 
-    socket.on('send-message', (msg, cb) => {
+    socket.on('send-message', async (msg, cb) => {
       if (!cb) return;
-      console.log(`${user.username} says: '${msg.content}' to ${msg.conversationId}`);
-      if (!socket.rooms.has(msg.conversationId)) {
-        console.log('User', user.username, 'is not in the room', msg.conversationId);
+      if (!msg?.conversationId || !msg?.content?.trim() || !msg?.clientMessageId) {
         cb(false);
         return;
       }
-      const message = {
-        ...msg,
-        senderInfo: {
-          userId: user.userId,
-          username: user.username,
-          displayName: user.displayName || user.username,
-          avatar: user.avatar,
-        },
-        createdAt: new Date().toISOString(),
-      };
-      // Send to all users except sender
-      socket.to(msg.conversationId).emit('new-message', message);
-      // Send to sender
-      cb(true, message);
-      // Save the message to DB
-      createMessage(user, msg).catch((err) => {
+      if (!socket.rooms.has(msg.conversationId) || !(await userInConversation(msg.conversationId, user.userId))) {
+        cb(false);
+        return;
+      }
+      try {
+        // Persist first so every delivery includes MongoDB's canonical _id.
+        const savedMessage = await createMessage(user, msg);
+        const message = savedMessage.toObject();
+        socket.to(msg.conversationId).emit('new-message', message);
+        cb(true, message);
+      } catch (err) {
         console.error('Failed to save message:', err);
-      });
+        cb(false);
+      }
     });
 
     socket.on('disconnect', () => {
